@@ -66,6 +66,10 @@ Experimental Chainguard transition build:
 DOCKERFILE=Dockerfile.xfce.amd64.chainguard TAG_SUFFIX=cg PUSH=0 ./build-amd64-image.sh
 ```
 
+Phase 2 runtime replacement planning:
+
+- [docs/phase2-base-image-migration.md](docs/phase2-base-image-migration.md)
+
 ## First Milestone: Local SOC Baseline
 
 The first practical milestone is now captured in:
