@@ -76,6 +76,12 @@ Phase 2 acceptance gate command:
 ANALYST_IMAGE=phoenixvlabs/nexus-webtop-soc:amd64-cg-latest ./scripts/validate-analyst-image.sh
 ```
 
+Phase 2 candidate wrapper (build + acceptance gate):
+
+```sh
+DOCKERFILE=Dockerfile.phase2a.amd64 TAG_SUFFIX=phase2a PUSH=0 ./scripts/run-phase2-candidate.sh
+```
+
 ## First Milestone: Local SOC Baseline
 
 The first practical milestone is now captured in:

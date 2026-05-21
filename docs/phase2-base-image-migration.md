@@ -64,3 +64,16 @@ ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate-analyst-image.sh
 ## Recommended Immediate Next Step
 
 Create the first true non-LinuxServer candidate Dockerfile and run the acceptance gate using a dedicated tag suffix (for example `phase2a`).
+
+Current scaffold:
+
+- Candidate Dockerfile: `Dockerfile.phase2a.amd64`
+- Build + gate wrapper: `scripts/run-phase2-candidate.sh`
+
+Run:
+
+```sh
+DOCKERFILE=Dockerfile.phase2a.amd64 TAG_SUFFIX=phase2a PUSH=0 ./scripts/run-phase2-candidate.sh
+```
+
+Note: `phase2a` is currently a runtime-plumbing candidate and does not claim XFCE analyst parity yet.
