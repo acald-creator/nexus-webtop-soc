@@ -1,41 +1,94 @@
-### Underground Nexus - Security Operation Center node
-> Current Version v0.2.0
+# Nexus Webtop SOC
 
-Latest images
+Nexus Webtop SOC is the legacy analyst desktop image for the Underground Nexus SOC environment.
 
-`docker pull phoenixvlabs/nexus-webtop-soc:amd64-latest`
+The proposed architecture moves SOC runtime services out of this webtop image. Wazuh, Suricata, optional Zeek, and AI triage should run as dedicated services. The webtop should become a client workspace for analysts, not the place where detection infrastructure is compiled and hosted.
 
-Signed images and its digest for verification. (v0.2.0)
+## Current Status
 
-Each of these images has being signed with `cosign` and also has `SBOM` generated with `syft`. Lastly, `attestation` is attached but it is experimental.
+The current image is based on `linuxserver/webtop:amd64-ubuntu-xfce`, installs GitKraken, and builds Suricata from source inside the image. That works for experimentation, but it mixes analyst desktop tooling with SOC detection runtime.
 
-```bash
-pyrrhus/soc-admin-webtop:amd64-latest
-sha256:e250caa63d880b2a30391047bb1a84531437aa2c440f4f7e1283446267b14228
+See [architecture.md](architecture.md) for the proposed architecture.
 
-# Download the generated SBOM
-COSIGN_EXPERIMENTAL=1 cosign download sbom \
-  pyrrhus/soc-admin-webtop:amd64-latest --output-file <NEWFILE>.spdx
+## Target Role
 
-# Download the generated attestation
-COSIGN_EXPERIMENTAL=1 cosign download attestation \
-  pyrrhus/soc-admin-webtop:amd64-latest --output-file <NEWFILE>.att
+The webtop SOC image is responsible for:
+
+- Analyst desktop access.
+- Browser access to Wazuh Dashboard, Grafana, and documentation.
+- Notes, terminals, and controlled investigation tooling.
+- Optional GUI utilities for local lab investigation.
+
+The webtop SOC image is not responsible for:
+
+- Running Wazuh manager, indexer, or dashboard services.
+- Running Suricata as an embedded desktop process.
+- Compiling production SOC tools inside a GUI image.
+- Storing SOC events.
+- Hosting AI triage services.
+
+## Target SOC Split
+
+| Component | Target location |
+| --- | --- |
+| Wazuh manager | Dedicated SOC service |
+| Wazuh indexer | Dedicated persistent event store |
+| Wazuh dashboard | Dedicated dashboard service |
+| Wazuh agents | Host and workload telemetry collectors |
+| Suricata | Dedicated network/protocol sensor |
+| Optional Zeek | Later protocol metadata sensor |
+| AI triage | Dedicated enrichment service |
+| Webtop | Analyst client workspace |
+
+## Image
+
+Current image:
+
+```sh
+docker pull phoenixvlabs/nexus-webtop-soc:amd64-latest
 ```
 
-**Docker Image Building Workflow**
+Current build asset:
 
-Registries:
-1. Dockerhub (pyrrhus/soc-admin-webtop)
-2. Azure Container Registry
-3. GitLab Container Registry (coming soon)
-4. GitHub Container Registry (coming soon)
+```text
+Dockerfile.xfce.amd64
+```
 
-**Experimental**
+Current build helper:
 
-Currently, SOC (Security-Operation-Center) is built using `linuxserver/webtop` and its desktop environment is `XFCE`. At the time when I was building the Dockerfile, I was testing different desktop environment, and for my own personal reason, I am using `XFCE`. However, the default build will be added soon.
+```text
+build-amd64-image.sh
+```
 
-This image comes preinstalled with `GitKraken` and `Suricata`. This is an optional SOC environment that can be expanded with whatever tools you want to add.
+## Local-Only and Deprecated Direction
 
-Future plans is to build two separate platforms `linux/amd64` and `linux-arm64`.
+| Item | Status | Direction |
+| --- | --- | --- |
+| Suricata built inside the webtop image | Deprecated direction | Move Suricata into a dedicated sensor image. |
+| GitKraken in SOC desktop | Optional | Keep only if needed by analyst workflow; prefer browser or CLI Git workflows. |
+| SOC control plane inside a desktop image | Deprecated direction | Split Wazuh services into dedicated workloads. |
+| Single `amd64` image only | Current limitation | Add architecture strategy if this image remains in use. |
+| Credentials or certificates in image | Not allowed | Use Vault HA or selected platform secret manager. |
 
-At this time, the container are signed with Azure KMS key. Before I was testing different keys, but for the moment, I am using multiple keys to see how easy it is to use.
+## Supply Chain
+
+This repository includes:
+
+```text
+soc-admin-webtop-amd64-latest.spdx
+```
+
+Historical Cosign, Syft, and attestation examples should move into dedicated supply-chain documentation if they need to be preserved. The README should stay focused on role, build path, architecture direction, and what is being moved out of the image.
+
+## AI Collaboration
+
+AI assistants should use these entrypoints:
+
+- [AGENTS.md](AGENTS.md) for Codex-style coding agents.
+- [CLAUDE.md](CLAUDE.md) for architecture critique and threat modeling.
+- [GEMINI.md](GEMINI.md) for research and platform comparison.
+- [architecture.md](architecture.md) as the source of truth for the proposed SOC split.
+
+## License
+
+See [LICENSE](LICENSE).
