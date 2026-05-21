@@ -25,7 +25,7 @@ deploy/suricata/suricata.yaml
 
 Analyst webtop image reference:
 
-- Default: `nexus-webtop-workbench:local`
+- Default: `phoenixvlabs/nexus-webtop-soc:amd64-cg-latest`
 - Override with `WEBTOP_ANALYST_IMAGE=<image:tag>`
 
 ## Start

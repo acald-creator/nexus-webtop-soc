@@ -101,8 +101,8 @@ If you have built the workbench image locally, enable the analyst profile:
 docker compose -f deploy/compose/soc-baseline.yml --profile analyst up -d
 ```
 
-If you want to use this repository's XFCE image instead, build `Dockerfile.xfce.amd64` and override `WEBTOP_ANALYST_IMAGE` as documented in [docs/soc-baseline.md](docs/soc-baseline.md).
-You can also run the experimental Chainguard-transition analyst image path documented in [docs/soc-baseline.md](docs/soc-baseline.md).
+By default, the analyst profile now uses `phoenixvlabs/nexus-webtop-soc:amd64-cg-latest`.  
+To use a different analyst image (workbench local or classic XFCE), override `WEBTOP_ANALYST_IMAGE` as documented in [docs/soc-baseline.md](docs/soc-baseline.md).
 
 ## Local-Only and Deprecated Direction
 

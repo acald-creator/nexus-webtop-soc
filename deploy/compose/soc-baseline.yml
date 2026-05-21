@@ -140,7 +140,7 @@ services:
     restart: unless-stopped
 
   webtop.analyst:
-    image: ${WEBTOP_ANALYST_IMAGE:-nexus-webtop-workbench:local}
+    image: ${WEBTOP_ANALYST_IMAGE:-phoenixvlabs/nexus-webtop-soc:amd64-cg-latest}
     container_name: webtop.analyst
     hostname: webtop.analyst
     profiles:
