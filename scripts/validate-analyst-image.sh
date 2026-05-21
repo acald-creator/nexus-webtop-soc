@@ -50,7 +50,18 @@ wait_for_healthy "suricata.sensor" "${TIMEOUT_SECONDS}"
 wait_for_healthy "${ANALYST_SERVICE}" "${TIMEOUT_SECONDS}"
 
 echo "[validate] checking web endpoint..."
-curl -fsSI --max-time 10 http://localhost:3000 >/dev/null
+web_ok=0
+for _ in $(seq 1 30); do
+  if curl -fsSI --max-time 5 http://localhost:3000 >/dev/null 2>&1; then
+    web_ok=1
+    break
+  fi
+  sleep 1
+done
+if [ "${web_ok}" != "1" ]; then
+  echo "[validate] web endpoint did not become ready on http://localhost:3000" >&2
+  exit 1
+fi
 
 echo "[validate] checking analyst tool availability..."
 docker exec "${ANALYST_SERVICE}" bash -lc 'git --version >/dev/null && curl --version >/dev/null'
@@ -66,9 +77,18 @@ fi
 
 if [ "${ACTIVE_DESKTOP_REQUIRED}" = "1" ]; then
   echo "[validate] checking active desktop session process..."
-  docker exec "${ANALYST_SERVICE}" bash -lc '
-    pgrep -x xfce4-session >/dev/null || pgrep -x openbox >/dev/null
-  '
+  active_ok=0
+  for _ in $(seq 1 30); do
+    if docker exec "${ANALYST_SERVICE}" bash -lc 'pgrep -x xfce4-session >/dev/null || pgrep -x openbox >/dev/null' >/dev/null 2>&1; then
+      active_ok=1
+      break
+    fi
+    sleep 1
+  done
+  if [ "${active_ok}" != "1" ]; then
+    echo "[validate] active desktop session process not detected in time" >&2
+    exit 1
+  fi
 else
   echo "[validate] ACTIVE_DESKTOP_REQUIRED=0, skipping active desktop session checks."
 fi

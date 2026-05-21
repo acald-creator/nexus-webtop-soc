@@ -9,17 +9,18 @@ ARG VERSION
 ENV VERSION=$VERSION
 ARG BUILD_TIMESTAMP
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
+ENV DISPLAY=:99
 
 LABEL description="Nexus Webtop SOC phase2b candidate (non-LinuxServer runtime with desktop marker)."
 LABEL org.opencontainers.image.vendor="Fenix Secure Labs"
 LABEL org.opencontainers.image.version="${VERSION}"
 LABEL org.opencontainers.image.created="${BUILD_TIMESTAMP}"
 
-RUN apk add --no-cache bash curl git nginx openbox
+RUN apk add --no-cache bash curl git nginx openbox Xvfb xkeyboard-config xkbcomp
 
 RUN addgroup -S nginx && adduser -S -D -H -G nginx nginx
 
-RUN mkdir -p /var/lib/nginx/tmp /run/nginx /usr/share/nginx/html
+RUN mkdir -p /var/lib/nginx/tmp /run/nginx /usr/share/nginx/html /usr/local/bin
 
 RUN cat > /etc/nginx/nginx.conf <<'EOF'
 worker_processes auto;
@@ -56,6 +57,34 @@ RUN cat > /usr/share/nginx/html/index.html <<'EOF'
 </html>
 EOF
 
+RUN cat > /usr/local/bin/start-phase2b.sh <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+export DISPLAY="${DISPLAY:-:99}"
+
+Xvfb "${DISPLAY}" -screen 0 1024x768x24 >/tmp/xvfb.log 2>&1 &
+# wait briefly for X server socket before starting session
+for _ in $(seq 1 30); do
+  if [ -S /tmp/.X11-unix/X99 ]; then
+    break
+  fi
+  sleep 0.2
+done
+
+# keep openbox session alive for active desktop validation
+(
+  while true; do
+    openbox >>/tmp/openbox.log 2>&1 || true
+    sleep 1
+  done
+) &
+
+exec nginx -g 'daemon off;'
+EOF
+
+RUN chmod +x /usr/local/bin/start-phase2b.sh
+
 EXPOSE 3000
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/local/bin/start-phase2b.sh"]

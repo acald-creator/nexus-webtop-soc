@@ -40,7 +40,7 @@ rows=(
   "cg-desktop-active|phoenixvlabs/nexus-webtop-soc:amd64-cg-latest|1|1|pass"
   "phase2a-desktop-active|phoenixvlabs/nexus-webtop-soc:amd64-phase2a-latest|1|1|fail"
   "phase2a-plumbing|phoenixvlabs/nexus-webtop-soc:amd64-phase2a-latest|0|0|pass"
-  "phase2b-desktop-active|phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest|1|1|fail"
+  "phase2b-desktop-active|phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest|1|1|pass"
   "phase2b-marker-only|phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest|1|0|pass"
 )
 
