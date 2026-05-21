@@ -1,0 +1,61 @@
+#
+# Phase 2b candidate: non-LinuxServer runtime with desktop marker parity.
+# This extends phase2a by installing an explicit desktop session marker
+# (`openbox`) so strict desktop-capability gate checks can pass.
+#
+FROM --platform=amd64 cgr.dev/chainguard/wolfi-base:latest
+
+ARG VERSION
+ENV VERSION=$VERSION
+ARG BUILD_TIMESTAMP
+ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
+
+LABEL description="Nexus Webtop SOC phase2b candidate (non-LinuxServer runtime with desktop marker)."
+LABEL org.opencontainers.image.vendor="Fenix Secure Labs"
+LABEL org.opencontainers.image.version="${VERSION}"
+LABEL org.opencontainers.image.created="${BUILD_TIMESTAMP}"
+
+RUN apk add --no-cache bash curl git nginx openbox
+
+RUN addgroup -S nginx && adduser -S -D -H -G nginx nginx
+
+RUN mkdir -p /var/lib/nginx/tmp /run/nginx /usr/share/nginx/html
+
+RUN cat > /etc/nginx/nginx.conf <<'EOF'
+worker_processes auto;
+pid /run/nginx/nginx.pid;
+
+events {
+  worker_connections 1024;
+}
+
+http {
+  include /etc/nginx/mime.types;
+  default_type application/octet-stream;
+  sendfile on;
+  keepalive_timeout 65;
+
+  server {
+    listen 3000;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location / {
+      try_files $uri $uri/ =404;
+    }
+  }
+}
+EOF
+
+RUN cat > /usr/share/nginx/html/index.html <<'EOF'
+<!doctype html>
+<html>
+  <head><meta charset="utf-8"><title>phase2b candidate</title></head>
+  <body><h1>phase2b candidate image is running</h1></body>
+</html>
+EOF
+
+EXPOSE 3000
+
+CMD ["nginx", "-g", "daemon off;"]

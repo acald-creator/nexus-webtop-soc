@@ -88,6 +88,13 @@ Phase 2 candidate wrapper (build + acceptance gate):
 DOCKERFILE=Dockerfile.phase2a.amd64 TAG_SUFFIX=phase2a PUSH=0 ./scripts/run-phase2-candidate.sh
 ```
 
+Phase 2b strict desktop-marker candidate:
+
+```sh
+DOCKERFILE=Dockerfile.phase2b.amd64 TAG_SUFFIX=phase2b PUSH=0 ./scripts/run-phase2-candidate.sh
+DESKTOP_REQUIRED=1 ANALYST_IMAGE=phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest ./scripts/validate-analyst-image.sh
+```
+
 Phase 2 matrix evaluation (report + logs):
 
 ```sh
