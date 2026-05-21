@@ -20,6 +20,20 @@ Pick one Phase 2 target path:
 2. Replace runtime with a custom minimal desktop stack on a hardened base.
 3. Split analyst UI runtime and tooling into separate sidecar-style services.
 
+## Current Decision
+
+The Phase 2a candidate (`Dockerfile.phase2a.amd64`) follows **Option 2**: replace runtime with a custom minimal desktop stack on a hardened base.
+
+The `phase2a` candidate uses `cgr.dev/chainguard/wolfi-base` as the runtime base with nginx serving a placeholder page on port 3000. It validates the build, publish, and compose integration path without claiming desktop parity.
+
+Matrix evaluation results (`docs/reports/phase2-evaluation-latest.md`) confirm:
+
+- `phase2a` passes plumbing checks (`DESKTOP_REQUIRED=0`)
+- `phase2a` correctly fails desktop-required checks (`DESKTOP_REQUIRED=1`)
+- The Chainguard transition track (`cg`) passes all checks including desktop markers
+
+Next step: build a `phase2b` candidate that adds a minimal web desktop session to the wolfi-base runtime.
+
 ## Candidate Evaluation Criteria
 
 Every candidate must be scored against:
@@ -78,6 +92,16 @@ Generated report:
 - Capture deltas: image size, startup behavior, known regressions.
 - Promote only after passing the gate twice in clean local runs.
 
+## Adding a New Candidate
+
+To add a new Phase 2 candidate:
+
+1. Create a new Dockerfile following the naming convention: `Dockerfile.<candidate-id>.amd64`
+2. Add an entry to the `rows` array in `scripts/evaluate-phase2-matrix.sh` with scenario name, image reference, desktop-required flag, and expected outcome
+3. Test locally: `DOCKERFILE=Dockerfile.<id>.amd64 TAG_SUFFIX=<id> PUSH=0 ./scripts/run-phase2-candidate.sh`
+4. Run the full matrix: `./scripts/evaluate-phase2-matrix.sh`
+5. Document findings in this file under a new subsection
+
 ## Recommended Immediate Next Step
 
 Create the first true non-LinuxServer candidate Dockerfile and run the acceptance gate using a dedicated tag suffix (for example `phase2a`).
@@ -85,6 +109,7 @@ Create the first true non-LinuxServer candidate Dockerfile and run the acceptanc
 Current scaffold:
 
 - Candidate Dockerfile: `Dockerfile.phase2a.amd64`
+- Candidate Dockerfile: `Dockerfile.phase2b.amd64`
 - Build + gate wrapper: `scripts/run-phase2-candidate.sh`
 
 Run:
@@ -94,3 +119,5 @@ DOCKERFILE=Dockerfile.phase2a.amd64 TAG_SUFFIX=phase2a PUSH=0 ./scripts/run-phas
 ```
 
 Note: `phase2a` is currently a runtime-plumbing candidate and does not claim XFCE analyst parity yet. The wrapper sets `DESKTOP_REQUIRED=0` by default.
+
+`phase2b` adds an explicit desktop marker package (`openbox`) for strict desktop-capability gate validation.

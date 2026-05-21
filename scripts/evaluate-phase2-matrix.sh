@@ -1,4 +1,33 @@
 #!/usr/bin/env bash
+#
+# evaluate-phase2-matrix.sh
+#
+# Runs all Phase 2 candidate scenarios through the acceptance gate and
+# generates a markdown report with pass/fail results.
+#
+# Usage:
+#   ./scripts/evaluate-phase2-matrix.sh
+#
+# Environment:
+#   REPORT_DIR       Output directory for report and logs (default: docs/reports)
+#   REPORT_FILE      Report filename (default: docs/reports/phase2-evaluation-latest.md)
+#   TIMEOUT_SECONDS  Healthcheck timeout per scenario (default: 180)
+#
+# Candidates:
+#   Candidates are defined in the 'rows' array below. Each entry is:
+#     scenario-name|image-reference|desktop-required-flag|expected-outcome
+#
+#   To add a new candidate:
+#   1. Create a Dockerfile following the naming convention Dockerfile.<id>.amd64
+#   2. Build it: DOCKERFILE=Dockerfile.<id>.amd64 TAG_SUFFIX=<id> PUSH=0 ./build-amd64-image.sh
+#   3. Add a row entry to the 'rows' array in this script
+#   4. Run this script to validate
+#
+# Output:
+#   - Markdown report: ${REPORT_DIR}/phase2-evaluation-latest.md
+#   - Per-scenario logs: ${REPORT_DIR}/<scenario-name>.log
+#   - Exit code 0 if all scenarios match expected outcomes, 1 otherwise
+#
 set -euo pipefail
 
 REPORT_DIR="${REPORT_DIR:-docs/reports}"
@@ -11,6 +40,7 @@ rows=(
   "cg-desktop-required|phoenixvlabs/nexus-webtop-soc:amd64-cg-latest|1|pass"
   "phase2a-desktop-required|phoenixvlabs/nexus-webtop-soc:amd64-phase2a-latest|1|fail"
   "phase2a-plumbing|phoenixvlabs/nexus-webtop-soc:amd64-phase2a-latest|0|pass"
+  "phase2b-desktop-required|phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest|1|pass"
 )
 
 {

@@ -131,6 +131,74 @@ docker compose -f deploy/compose/soc-baseline.yml down -v
 - Suricata event forwarding uses a lightweight `busybox` tail-and-forward pattern as a Phase 1 bridge.
 - This stack does not yet include full agent enrollment automation or AI enrichment.
 
+## Pinned Versions
+
+This baseline uses:
+
+| Component | Image | Version |
+|-----------|-------|--------|
+| Wazuh indexer | `wazuh/wazuh-indexer` | `4.7.5` |
+| Wazuh manager | `wazuh/wazuh-manager` | `4.7.5` |
+| Wazuh dashboard | `wazuh/wazuh-dashboard` | `4.7.5` |
+| Suricata sensor | `jasonish/suricata` | `7.0` |
+| Event forwarder | `busybox` | `1.36` |
+| Analyst webtop | `phoenixvlabs/nexus-webtop-soc` | `amd64-cg-latest` (default) |
+
+## Troubleshooting
+
+### Indexer fails to start or crashes with OOM
+
+The Wazuh indexer (OpenSearch) requires `vm.max_map_count` to be at least `262144` on the Docker host:
+
+```sh
+sudo sysctl -w vm.max_map_count=262144
+```
+
+To make it persistent, add `vm.max_map_count=262144` to `/etc/sysctl.conf`.
+
+### Dashboard shows connection errors after fresh start
+
+On a fresh stack (`down -v`), the dashboard may fail to connect until security is initialized. Run:
+
+```sh
+./scripts/bootstrap-wazuh-security.sh
+```
+
+This reconciles OpenSearch security config and restarts manager and dashboard.
+
+### Suricata not capturing traffic
+
+Suricata captures on `eth0` inside the container, which maps to the `soc-net` Docker bridge. If there is no traffic on the bridge network, `eve.json` will remain empty. Generate test traffic:
+
+```sh
+docker compose -f deploy/compose/soc-baseline.yml exec suricata.sensor \
+  sh -c 'wget -qO /dev/null http://wazuh.dashboard:5601 || true'
+```
+
+On some Docker network drivers, the bridge may not expose inter-container traffic to Suricata. Verify with:
+
+```sh
+docker compose -f deploy/compose/soc-baseline.yml exec suricata.sensor \
+  sh -c 'test -s /var/log/suricata/eve.json && echo "events present" || echo "no events"'
+```
+
+### Healthcheck details
+
+Each service has a TCP port-open healthcheck:
+
+| Service | Healthcheck port | What it validates |
+|---------|-----------------|------------------|
+| `wazuh.indexer` | 9200 | OpenSearch API is accepting connections |
+| `wazuh.manager` | 55000 | Wazuh API is accepting connections |
+| `wazuh.dashboard` | 5601 | Dashboard HTTP server is up |
+| `suricata.sensor` | (file check) | `/var/log/suricata/eve.json` exists |
+
+Startup ordering: indexer must be healthy before manager starts; both must be healthy before dashboard starts. Suricata sensor must be healthy before forwarder starts.
+
+### `/nexus-bucket` volume
+
+The `VOLUME ["/config", "/nexus-bucket"]` directive appears in `Dockerfile.xfce.amd64` and `Dockerfile.xfce.amd64.chainguard` but `/nexus-bucket` is not mounted in the compose stack. It is a legacy artifact from earlier designs. The compose stack uses `soc-shared` as the shared workspace instead.
+
 ## Verify Suricata Event Forwarding
 
 Check the forwarder container:

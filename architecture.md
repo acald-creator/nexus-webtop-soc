@@ -138,3 +138,63 @@ Milestone scope:
 - Documented storage, credentials, and network ports.
 
 After that baseline is stable, add the AI triage service as a separate workload.
+
+## 8. Network, Ports, and Volumes
+
+The compose stack defined in `deploy/compose/soc-baseline.yml` uses the following network topology.
+
+**Network**: `soc-net` (bridge driver). All services are on this network.
+
+**Exposed Ports**:
+
+| Port | Protocol | Service | Purpose |
+| --- | --- | --- | --- |
+| 9200 | TCP (HTTPS) | wazuh.indexer | OpenSearch API |
+| 1514 | UDP | wazuh.manager | Agent/event ingestion |
+| 1515 | TCP | wazuh.manager | Agent enrollment |
+| 55000 | TCP (HTTPS) | wazuh.manager | Wazuh API |
+| 5601 | TCP (HTTP) | wazuh.dashboard | Dashboard UI |
+| 3000 | TCP (HTTP) | webtop.analyst | Analyst desktop (analyst profile only) |
+
+**Named Volumes**:
+
+| Volume | Service | Content |
+| --- | --- | --- |
+| wazuh-indexer-data | wazuh.indexer | OpenSearch indices and security events |
+| wazuh-manager-data | wazuh.manager | Agent data and OSSEC runtime state |
+| wazuh-manager-etc | wazuh.manager | Manager configuration (ossec.conf, rules, decoders) |
+| wazuh-manager-logs | wazuh.manager | Manager and alert logs |
+| suricata-logs | suricata.sensor, suricata.forwarder | Suricata eve.json and fast.log (shared) |
+| webtop-analyst-config | webtop.analyst | Analyst desktop persistent config |
+| soc-shared | webtop.analyst | Shared workspace between analyst and SOC services |
+
+## 9. Current Credential State
+
+The baseline compose stack uses intentionally simple credentials for Phase 1 lab bring-up.
+
+- The compose stack uses `admin` / `admin` for indexer, manager-to-indexer, and dashboard authentication (defined as environment variables in `soc-baseline.yml`).
+- `bootstrap-wazuh-security.sh` uses the indexer's built-in TLS certificates at `/usr/share/wazuh-indexer/certs/` (root-ca.pem, admin.pem, admin-key.pem). These are the default certs shipped in the Wazuh indexer image.
+- The dashboard has `SERVER_SSL_ENABLED=false` for local lab access.
+- **Target state**: Vault HA or platform secret manager. No credentials or certificates should be baked into images. This baseline uses local defaults intentionally as a Phase 1 lab configuration.
+
+## 10. Pinned Versions
+
+| Component | Image | Version | Notes |
+| --- | --- | --- | --- |
+| Wazuh indexer | wazuh/wazuh-indexer | 4.7.5 | Pinned in compose |
+| Wazuh manager | wazuh/wazuh-manager | 4.7.5 | Pinned in compose |
+| Wazuh dashboard | wazuh/wazuh-dashboard | 4.7.5 | Pinned in compose |
+| Suricata sensor | jasonish/suricata | 7.0 | Pinned in compose |
+| Suricata forwarder | busybox | 1.36 | Lightweight tail+nc bridge |
+| Analyst desktop (default) | linuxserver/webtop | amd64-ubuntu-xfce | Used by Dockerfile.xfce.amd64 |
+| Phase 2a candidate base | cgr.dev/chainguard/wolfi-base | latest | Used by Dockerfile.phase2a.amd64 |
+
+> [!NOTE]
+> Chainguard images listed in section 3 (Wazuh manager, indexer, dashboard, agent) are aspirational targets. As of this writing, Chainguard does not publish dedicated Wazuh application images. The `cg` track in this repo uses the LinuxServer base with reduced package footprint as a transition step, not a true Chainguard runtime.
+
+## 11. Related Repositories
+
+| Repository | Relationship |
+| --- | --- |
+| `core-nexus` | Underground Nexus architecture. This repo must stay aligned with core-nexus design decisions. |
+| `nexus-webtop-workbench` | Dedicated analyst workbench image (MATE desktop). Recommended as Option A for the analyst profile in the SOC baseline. This repo's XFCE image is Option B. |
