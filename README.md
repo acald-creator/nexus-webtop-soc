@@ -82,6 +82,12 @@ Desktop parity marker checks are enabled by default. For runtime-plumbing candid
 DESKTOP_REQUIRED=0 ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate-analyst-image.sh
 ```
 
+To enforce active desktop session checks:
+
+```sh
+ACTIVE_DESKTOP_REQUIRED=1 ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate-analyst-image.sh
+```
+
 Phase 2 candidate wrapper (build + acceptance gate):
 
 ```sh

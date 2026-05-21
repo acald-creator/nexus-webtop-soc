@@ -6,6 +6,7 @@ ANALYST_IMAGE="${ANALYST_IMAGE:-phoenixvlabs/nexus-webtop-soc:amd64-cg-latest}"
 ANALYST_SERVICE="${ANALYST_SERVICE:-webtop.analyst}"
 TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-180}"
 DESKTOP_REQUIRED="${DESKTOP_REQUIRED:-1}"
+ACTIVE_DESKTOP_REQUIRED="${ACTIVE_DESKTOP_REQUIRED:-0}"
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker is required" >&2
@@ -61,6 +62,15 @@ if [ "${DESKTOP_REQUIRED}" = "1" ]; then
   '
 else
   echo "[validate] DESKTOP_REQUIRED=0, skipping desktop capability marker checks."
+fi
+
+if [ "${ACTIVE_DESKTOP_REQUIRED}" = "1" ]; then
+  echo "[validate] checking active desktop session process..."
+  docker exec "${ANALYST_SERVICE}" bash -lc '
+    pgrep -x xfce4-session >/dev/null || pgrep -x openbox >/dev/null
+  '
+else
+  echo "[validate] ACTIVE_DESKTOP_REQUIRED=0, skipping active desktop session checks."
 fi
 
 echo "[validate] candidate image passed acceptance gate checks."

@@ -37,10 +37,11 @@ TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-180}"
 mkdir -p "${REPORT_DIR}"
 
 rows=(
-  "cg-desktop-required|phoenixvlabs/nexus-webtop-soc:amd64-cg-latest|1|pass"
-  "phase2a-desktop-required|phoenixvlabs/nexus-webtop-soc:amd64-phase2a-latest|1|fail"
-  "phase2a-plumbing|phoenixvlabs/nexus-webtop-soc:amd64-phase2a-latest|0|pass"
-  "phase2b-desktop-required|phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest|1|pass"
+  "cg-desktop-active|phoenixvlabs/nexus-webtop-soc:amd64-cg-latest|1|1|pass"
+  "phase2a-desktop-active|phoenixvlabs/nexus-webtop-soc:amd64-phase2a-latest|1|1|fail"
+  "phase2a-plumbing|phoenixvlabs/nexus-webtop-soc:amd64-phase2a-latest|0|0|pass"
+  "phase2b-desktop-active|phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest|1|1|fail"
+  "phase2b-marker-only|phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest|1|0|pass"
 )
 
 {
@@ -49,21 +50,22 @@ rows=(
   echo "- Generated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
   echo "- Host: $(hostname)"
   echo
-  echo "| Scenario | Image | Desktop Required | Expected | Actual | Result |"
-  echo "| --- | --- | --- | --- | --- | --- |"
+  echo "| Scenario | Image | Desktop Required | Active Session Required | Expected | Actual | Result |"
+  echo "| --- | --- | --- | --- | --- | --- | --- |"
 } > "${REPORT_FILE}"
 
 all_ok=1
 
 for row in "${rows[@]}"; do
-  IFS="|" read -r name image desktop_required expected <<< "${row}"
+  IFS="|" read -r name image desktop_required active_required expected <<< "${row}"
   log_file="${REPORT_DIR}/${name}.log"
 
-  echo "[matrix] running ${name} (image=${image}, desktop=${desktop_required}, expected=${expected})"
+  echo "[matrix] running ${name} (image=${image}, desktop=${desktop_required}, active=${active_required}, expected=${expected})"
 
   set +e
   ANALYST_IMAGE="${image}" \
   DESKTOP_REQUIRED="${desktop_required}" \
+  ACTIVE_DESKTOP_REQUIRED="${active_required}" \
   TIMEOUT_SECONDS="${TIMEOUT_SECONDS}" \
     ./scripts/validate-analyst-image.sh > "${log_file}" 2>&1
   rc=$?
@@ -82,7 +84,7 @@ for row in "${rows[@]}"; do
     all_ok=0
   fi
 
-  echo "| ${name} | \`${image}\` | \`${desktop_required}\` | \`${expected}\` | \`${actual}\` | **${verdict}** |" >> "${REPORT_FILE}"
+  echo "| ${name} | \`${image}\` | \`${desktop_required}\` | \`${active_required}\` | \`${expected}\` | \`${actual}\` | **${verdict}** |" >> "${REPORT_FILE}"
 done
 
 echo >> "${REPORT_FILE}"
