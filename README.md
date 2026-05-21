@@ -76,6 +76,12 @@ Phase 2 acceptance gate command:
 ANALYST_IMAGE=phoenixvlabs/nexus-webtop-soc:amd64-cg-latest ./scripts/validate-analyst-image.sh
 ```
 
+Desktop parity marker checks are enabled by default. For runtime-plumbing candidates only:
+
+```sh
+DESKTOP_REQUIRED=0 ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate-analyst-image.sh
+```
+
 Phase 2 candidate wrapper (build + acceptance gate):
 
 ```sh

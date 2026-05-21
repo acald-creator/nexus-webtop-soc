@@ -50,6 +50,13 @@ Run these checks with:
 ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate-analyst-image.sh
 ```
 
+Desktop parity check is enabled by default (`DESKTOP_REQUIRED=1`).
+For runtime-plumbing candidates that intentionally do not include desktop session components yet, run with:
+
+```sh
+DESKTOP_REQUIRED=0 ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate-analyst-image.sh
+```
+
 ## Implementation Checklist
 
 - Add candidate Dockerfile and keep existing Dockerfile unchanged.
@@ -76,4 +83,4 @@ Run:
 DOCKERFILE=Dockerfile.phase2a.amd64 TAG_SUFFIX=phase2a PUSH=0 ./scripts/run-phase2-candidate.sh
 ```
 
-Note: `phase2a` is currently a runtime-plumbing candidate and does not claim XFCE analyst parity yet.
+Note: `phase2a` is currently a runtime-plumbing candidate and does not claim XFCE analyst parity yet. The wrapper sets `DESKTOP_REQUIRED=0` by default.

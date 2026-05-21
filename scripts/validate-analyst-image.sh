@@ -5,6 +5,7 @@ COMPOSE_FILE="${COMPOSE_FILE:-deploy/compose/soc-baseline.yml}"
 ANALYST_IMAGE="${ANALYST_IMAGE:-phoenixvlabs/nexus-webtop-soc:amd64-cg-latest}"
 ANALYST_SERVICE="${ANALYST_SERVICE:-webtop.analyst}"
 TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-180}"
+DESKTOP_REQUIRED="${DESKTOP_REQUIRED:-1}"
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker is required" >&2
@@ -52,5 +53,14 @@ curl -fsSI --max-time 10 http://localhost:3000 >/dev/null
 
 echo "[validate] checking analyst tool availability..."
 docker exec "${ANALYST_SERVICE}" bash -lc 'git --version >/dev/null && curl --version >/dev/null'
+
+if [ "${DESKTOP_REQUIRED}" = "1" ]; then
+  echo "[validate] checking desktop capability markers..."
+  docker exec "${ANALYST_SERVICE}" bash -lc '
+    command -v xfce4-session >/dev/null || command -v openbox >/dev/null
+  '
+else
+  echo "[validate] DESKTOP_REQUIRED=0, skipping desktop capability marker checks."
+fi
 
 echo "[validate] candidate image passed acceptance gate checks."
