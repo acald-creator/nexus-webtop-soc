@@ -81,6 +81,12 @@ Start it with:
 docker compose -f deploy/compose/soc-baseline.yml up -d
 ```
 
+For a fresh stack (`down -v`), initialize indexer security:
+
+```sh
+./scripts/bootstrap-wazuh-security.sh
+```
+
 If you have built the workbench image locally, enable the analyst profile:
 
 ```sh

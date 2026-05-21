@@ -65,9 +65,10 @@ docker compose -f deploy/compose/soc-baseline.yml --profile analyst up -d
 On a fresh stack (`down -v`), initialize indexer security once:
 
 ```sh
-docker exec wazuh.indexer bash -lc 'export OPENSEARCH_JAVA_HOME=/usr/share/wazuh-indexer/jdk; export JAVA_HOME=/usr/share/wazuh-indexer/jdk; export PATH=$JAVA_HOME/bin:$PATH; bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh -cd /usr/share/wazuh-indexer/opensearch-security/ -icl -nhnv -cacert /usr/share/wazuh-indexer/certs/root-ca.pem -cert /usr/share/wazuh-indexer/certs/admin.pem -key /usr/share/wazuh-indexer/certs/admin-key.pem'
-docker compose -f deploy/compose/soc-baseline.yml restart wazuh.manager wazuh.dashboard
+./scripts/bootstrap-wazuh-security.sh
 ```
+
+This command is safe to rerun; it reconciles security config and restarts manager/dashboard.
 
 Option B: use this repository's XFCE SOC webtop image.
 
