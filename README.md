@@ -60,6 +60,34 @@ Current build helper:
 build-amd64-image.sh
 ```
 
+## First Milestone: Local SOC Baseline
+
+The first practical milestone is now captured in:
+
+- [docs/soc-baseline.md](docs/soc-baseline.md)
+
+This baseline runs:
+
+- Wazuh manager
+- Wazuh indexer
+- Wazuh dashboard
+- Suricata sensor
+- Analyst webtop client (optional `analyst` profile)
+
+Start it with:
+
+```sh
+docker compose -f deploy/compose/soc-baseline.yml up -d
+```
+
+If you have built the workbench image locally, enable the analyst profile:
+
+```sh
+docker compose -f deploy/compose/soc-baseline.yml --profile analyst up -d
+```
+
+If you want to use this repository's XFCE image instead, build `Dockerfile.xfce.amd64` and override `WEBTOP_ANALYST_IMAGE` as documented in [docs/soc-baseline.md](docs/soc-baseline.md).
+
 ## Local-Only and Deprecated Direction
 
 | Item | Status | Direction |
