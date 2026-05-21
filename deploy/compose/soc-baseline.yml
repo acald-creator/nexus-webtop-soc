@@ -7,8 +7,6 @@ services:
       - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
       - "bootstrap.memory_lock=true"
       - "discovery.type=single-node"
-      - "plugins.security.ssl.http.enabled=false"
-      - "plugins.security.disabled=true"
     ulimits:
       memlock:
         soft: -1
@@ -30,7 +28,9 @@ services:
     depends_on:
       - wazuh.indexer
     environment:
-      - INDEXER_URL=http://wazuh.indexer:9200
+      - INDEXER_URL=https://wazuh.indexer:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=admin
       - FILEBEAT_SSL_VERIFICATION_MODE=none
       - SSL_CERTIFICATE_AUTHORITIES=
     volumes:
@@ -52,7 +52,10 @@ services:
       - wazuh.indexer
       - wazuh.manager
     environment:
-      - INDEXER_URL=http://wazuh.indexer:9200
+      - INDEXER_URL=https://wazuh.indexer:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=admin
+      - WAZUH_API_URL=https://wazuh.manager
       - DASHBOARD_USERNAME=admin
       - DASHBOARD_PASSWORD=admin
       - SERVER_SSL_ENABLED=false

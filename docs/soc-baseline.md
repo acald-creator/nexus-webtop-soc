@@ -62,6 +62,13 @@ Then from this repository:
 docker compose -f deploy/compose/soc-baseline.yml --profile analyst up -d
 ```
 
+On a fresh stack (`down -v`), initialize indexer security once:
+
+```sh
+docker exec wazuh.indexer bash -lc 'export OPENSEARCH_JAVA_HOME=/usr/share/wazuh-indexer/jdk; export JAVA_HOME=/usr/share/wazuh-indexer/jdk; export PATH=$JAVA_HOME/bin:$PATH; bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh -cd /usr/share/wazuh-indexer/opensearch-security/ -icl -nhnv -cacert /usr/share/wazuh-indexer/certs/root-ca.pem -cert /usr/share/wazuh-indexer/certs/admin.pem -key /usr/share/wazuh-indexer/certs/admin-key.pem'
+docker compose -f deploy/compose/soc-baseline.yml restart wazuh.manager wazuh.dashboard
+```
+
 Option B: use this repository's XFCE SOC webtop image.
 
 Build in this repository:
@@ -82,7 +89,7 @@ docker compose -f deploy/compose/soc-baseline.yml --profile analyst up -d
 Default local ports:
 
 - Wazuh Dashboard: `http://localhost:5601`
-- Wazuh Indexer (OpenSearch API): `http://localhost:9200`
+- Wazuh Indexer (OpenSearch API): `https://localhost:9200`
 - Wazuh Manager API: `https://localhost:55000`
 - Analyst webtop: `http://localhost:3000` (when `analyst` profile is enabled)
 
@@ -101,8 +108,8 @@ docker compose -f deploy/compose/soc-baseline.yml down -v
 ## Notes and Constraints
 
 - The indexer is configured for single-node local mode.
-- TLS and security plugin hardening in the indexer are reduced for local startup simplicity.
-- Dashboard credentials are local defaults in this baseline.
+- HTTPS and default local admin credentials are used for indexer and dashboard wiring.
+- Dashboard credentials are local defaults in this baseline (`admin` or `kibanaserver` depending on image defaults).
 - Suricata runs with packet capture capabilities (`NET_ADMIN`, `NET_RAW`) and should remain isolated to lab networks.
 - Suricata event forwarding uses a lightweight `busybox` tail-and-forward pattern as a Phase 1 bridge.
 - This stack does not yet include full agent enrollment automation or AI enrichment.
