@@ -88,6 +88,12 @@ Phase 2 candidate wrapper (build + acceptance gate):
 DOCKERFILE=Dockerfile.phase2a.amd64 TAG_SUFFIX=phase2a PUSH=0 ./scripts/run-phase2-candidate.sh
 ```
 
+Phase 2 matrix evaluation (report + logs):
+
+```sh
+./scripts/evaluate-phase2-matrix.sh
+```
+
 ## First Milestone: Local SOC Baseline
 
 The first practical milestone is now captured in:

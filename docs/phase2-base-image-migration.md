@@ -57,6 +57,16 @@ For runtime-plumbing candidates that intentionally do not include desktop sessio
 DESKTOP_REQUIRED=0 ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate-analyst-image.sh
 ```
 
+To run the current candidate matrix and generate a report:
+
+```sh
+./scripts/evaluate-phase2-matrix.sh
+```
+
+Generated report:
+
+- `docs/reports/phase2-evaluation-latest.md`
+
 ## Implementation Checklist
 
 - Add candidate Dockerfile and keep existing Dockerfile unchanged.
