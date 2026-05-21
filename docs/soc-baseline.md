@@ -4,6 +4,7 @@ This baseline is the first practical step toward the proposed SOC split:
 
 - Wazuh manager, indexer, and dashboard run as dedicated services.
 - Suricata runs as a dedicated sensor.
+- Suricata `eve.json` is forwarded into Wazuh manager over UDP `1514`.
 - Webtop is only the analyst client.
 
 This is a local lab baseline, not a production deployment.
@@ -103,12 +104,34 @@ docker compose -f deploy/compose/soc-baseline.yml down -v
 - TLS and security plugin hardening in the indexer are reduced for local startup simplicity.
 - Dashboard credentials are local defaults in this baseline.
 - Suricata runs with packet capture capabilities (`NET_ADMIN`, `NET_RAW`) and should remain isolated to lab networks.
-- This stack does not yet include agent enrollment automation or AI enrichment.
+- Suricata event forwarding uses a lightweight `busybox` tail-and-forward pattern as a Phase 1 bridge.
+- This stack does not yet include full agent enrollment automation or AI enrichment.
+
+## Verify Suricata Event Forwarding
+
+Check the forwarder container:
+
+```sh
+docker compose -f deploy/compose/soc-baseline.yml logs --tail=50 suricata.forwarder
+```
+
+Generate traffic from a container in `soc-net` and confirm Suricata writes events:
+
+```sh
+docker compose -f deploy/compose/soc-baseline.yml exec suricata.sensor \
+  sh -c "tail -n 20 /var/log/suricata/eve.json"
+```
+
+Then inspect Wazuh manager logs:
+
+```sh
+docker compose -f deploy/compose/soc-baseline.yml logs --tail=100 wazuh.manager
+```
 
 ## Next Milestone
 
 After this baseline is stable:
 
-1. Route Suricata `eve.json` into Wazuh ingestion with explicit parsing.
+1. Replace the bridge forwarder with explicit Suricata event parsing and normalized Wazuh mapping.
 2. Add one Wazuh agent enrollment example.
 3. Add AI triage as a separate service with versioned scoring metadata.

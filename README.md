@@ -72,6 +72,7 @@ This baseline runs:
 - Wazuh indexer
 - Wazuh dashboard
 - Suricata sensor
+- Suricata event forwarder into Wazuh manager
 - Analyst webtop client (optional `analyst` profile)
 
 Start it with:

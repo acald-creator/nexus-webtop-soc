@@ -80,6 +80,25 @@ services:
       - soc-net
     restart: unless-stopped
 
+  suricata.forwarder:
+    image: busybox:1.36
+    container_name: suricata.forwarder
+    hostname: suricata.forwarder
+    depends_on:
+      - suricata.sensor
+      - wazuh.manager
+    command:
+      - /bin/sh
+      - -c
+      - |
+        touch /var/log/suricata/eve.json
+        tail -F /var/log/suricata/eve.json | nc -u wazuh.manager 1514
+    volumes:
+      - suricata-logs:/var/log/suricata
+    networks:
+      - soc-net
+    restart: unless-stopped
+
   webtop.analyst:
     image: ${WEBTOP_ANALYST_IMAGE:-nexus-webtop-workbench:local}
     container_name: webtop.analyst
