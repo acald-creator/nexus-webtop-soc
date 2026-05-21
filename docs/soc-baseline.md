@@ -86,6 +86,21 @@ WEBTOP_ANALYST_IMAGE=nexus-webtop-soc:local \
 docker compose -f deploy/compose/soc-baseline.yml --profile analyst up -d
 ```
 
+Option C: use the experimental Chainguard-transition analyst image.
+
+Build in this repository:
+
+```sh
+DOCKERFILE=Dockerfile.xfce.amd64.chainguard TAG_SUFFIX=cg PUSH=0 ./build-amd64-image.sh
+```
+
+Then run with explicit override:
+
+```sh
+WEBTOP_ANALYST_IMAGE=phoenixvlabs/nexus-webtop-soc:amd64-cg-latest \
+docker compose -f deploy/compose/soc-baseline.yml --profile analyst up -d webtop.analyst
+```
+
 ## Access
 
 Default local ports:
@@ -135,6 +150,16 @@ Then inspect Wazuh manager logs:
 
 ```sh
 docker compose -f deploy/compose/soc-baseline.yml logs --tail=100 wazuh.manager
+```
+
+## Analyst Image Smoke Check
+
+After changing `WEBTOP_ANALYST_IMAGE`, verify:
+
+```sh
+docker compose -f deploy/compose/soc-baseline.yml ps webtop.analyst
+curl -I --max-time 10 http://localhost:3000
+docker exec webtop.analyst bash -lc 'git --version && curl --version | head -n 1'
 ```
 
 ## Next Milestone

@@ -102,6 +102,7 @@ docker compose -f deploy/compose/soc-baseline.yml --profile analyst up -d
 ```
 
 If you want to use this repository's XFCE image instead, build `Dockerfile.xfce.amd64` and override `WEBTOP_ANALYST_IMAGE` as documented in [docs/soc-baseline.md](docs/soc-baseline.md).
+You can also run the experimental Chainguard-transition analyst image path documented in [docs/soc-baseline.md](docs/soc-baseline.md).
 
 ## Local-Only and Deprecated Direction
 
