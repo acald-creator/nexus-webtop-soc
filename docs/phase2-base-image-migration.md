@@ -44,6 +44,12 @@ A candidate passes only if all checks pass:
    - `suricata.sensor` healthy
 5. `./scripts/bootstrap-wazuh-security.sh` still succeeds after a fresh `down -v`.
 
+Run these checks with:
+
+```sh
+ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate-analyst-image.sh
+```
+
 ## Implementation Checklist
 
 - Add candidate Dockerfile and keep existing Dockerfile unchanged.

@@ -70,6 +70,12 @@ Phase 2 runtime replacement planning:
 
 - [docs/phase2-base-image-migration.md](docs/phase2-base-image-migration.md)
 
+Phase 2 acceptance gate command:
+
+```sh
+ANALYST_IMAGE=phoenixvlabs/nexus-webtop-soc:amd64-cg-latest ./scripts/validate-analyst-image.sh
+```
+
 ## First Milestone: Local SOC Baseline
 
 The first practical milestone is now captured in:
