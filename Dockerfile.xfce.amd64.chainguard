@@ -1,0 +1,45 @@
+#
+# Experimental Chainguard-transition Dockerfile.
+# This keeps the LinuxServer XFCE runtime for webtop compatibility while we
+# progressively reduce package footprint and move toward Chainguard-aligned
+# supply-chain controls.
+#
+# Build with:
+#   DOCKERFILE=Dockerfile.xfce.amd64.chainguard TAG_SUFFIX=cg PUSH=0 ./build-amd64-image.sh
+#
+FROM --platform=amd64 linuxserver/webtop:amd64-ubuntu-xfce
+
+ARG VERSION
+ENV VERSION=$VERSION
+ARG BUILD_TIMESTAMP
+ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
+ARG INSTALL_GITKRAKEN=0
+
+LABEL description="Nexus Webtop SOC analyst desktop (Chainguard transition track)."
+LABEL org.opencontainers.image.vendor="Fenix Secure Labs"
+LABEL org.opencontainers.image.version="${VERSION}"
+LABEL org.opencontainers.image.created="${BUILD_TIMESTAMP}"
+
+VOLUME ["/config", "/nexus-bucket"]
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends \
+        ca-certificates \
+        curl \
+        git \
+        libnss3 \
+        libnotify4 \
+        vim \
+        wget \
+        xdg-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN if [ "$INSTALL_GITKRAKEN" = "1" ]; then \
+      wget -q https://release.gitkraken.com/linux/gitkraken-amd64.deb && \
+      DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ./gitkraken-amd64.deb && \
+      rm -f gitkraken-amd64.deb ; \
+    fi
+
+EXPOSE 3000

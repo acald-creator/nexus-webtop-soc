@@ -60,6 +60,12 @@ Current build helper:
 build-amd64-image.sh
 ```
 
+Experimental Chainguard transition build:
+
+```sh
+DOCKERFILE=Dockerfile.xfce.amd64.chainguard TAG_SUFFIX=cg PUSH=0 ./build-amd64-image.sh
+```
+
 ## First Milestone: Local SOC Baseline
 
 The first practical milestone is now captured in:
