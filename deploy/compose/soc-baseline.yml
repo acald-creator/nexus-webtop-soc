@@ -20,13 +20,22 @@ services:
       - soc-net
     ports:
       - "9200:9200"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - bash -lc 'echo > /dev/tcp/127.0.0.1/9200'
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
   wazuh.manager:
     image: wazuh/wazuh-manager:4.7.5
     container_name: wazuh.manager
     hostname: wazuh.manager
     depends_on:
-      - wazuh.indexer
+      wazuh.indexer:
+        condition: service_healthy
     environment:
       - INDEXER_URL=https://wazuh.indexer:9200
       - INDEXER_USERNAME=admin
@@ -43,14 +52,24 @@ services:
       - "1514:1514/udp"
       - "1515:1515"
       - "55000:55000"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - bash -lc 'echo > /dev/tcp/127.0.0.1/55000'
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
   wazuh.dashboard:
     image: wazuh/wazuh-dashboard:4.7.5
     container_name: wazuh.dashboard
     hostname: wazuh.dashboard
     depends_on:
-      - wazuh.indexer
-      - wazuh.manager
+      wazuh.indexer:
+        condition: service_healthy
+      wazuh.manager:
+        condition: service_healthy
     environment:
       - INDEXER_URL=https://wazuh.indexer:9200
       - INDEXER_USERNAME=admin
@@ -63,6 +82,14 @@ services:
       - soc-net
     ports:
       - "5601:5601"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - bash -lc 'echo > /dev/tcp/127.0.0.1/5601'
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
   suricata.sensor:
     image: jasonish/suricata:7.0
@@ -82,14 +109,24 @@ services:
     networks:
       - soc-net
     restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - test -f /var/log/suricata/eve.json
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   suricata.forwarder:
     image: busybox:1.36
     container_name: suricata.forwarder
     hostname: suricata.forwarder
     depends_on:
-      - suricata.sensor
-      - wazuh.manager
+      suricata.sensor:
+        condition: service_healthy
+      wazuh.manager:
+        condition: service_healthy
     command:
       - /bin/sh
       - -c

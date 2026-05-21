@@ -37,6 +37,7 @@ docker compose -f deploy/compose/soc-baseline.yml up -d
 ```
 
 This starts the SOC core services only (indexer, manager, dashboard, and Suricata sensor).
+Compose healthchecks gate startup ordering for manager, dashboard, and the Suricata forwarder.
 
 Check status:
 

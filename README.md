@@ -81,6 +81,8 @@ Start it with:
 docker compose -f deploy/compose/soc-baseline.yml up -d
 ```
 
+The compose stack now uses healthchecks and dependency conditions for deterministic service startup ordering.
+
 For a fresh stack (`down -v`), initialize indexer security:
 
 ```sh

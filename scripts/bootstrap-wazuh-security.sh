@@ -16,6 +16,19 @@ until docker ps --format '{{.Names}}' | grep -qx "${INDEXER_CONTAINER}"; do
   sleep 2
 done
 
+echo "[bootstrap] waiting for ${INDEXER_CONTAINER} health status..."
+for _ in $(seq 1 90); do
+  status="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "${INDEXER_CONTAINER}" 2>/dev/null || true)"
+  if [ "${status}" = "healthy" ] || [ "${status}" = "none" ]; then
+    break
+  fi
+  sleep 2
+done
+if [ "${status}" != "healthy" ] && [ "${status}" != "none" ]; then
+  echo "[bootstrap] indexer did not become healthy in time (status: ${status})" >&2
+  exit 1
+fi
+
 echo "[bootstrap] reconciling OpenSearch security configuration in ${INDEXER_CONTAINER}..."
 docker exec "${INDEXER_CONTAINER}" bash -lc '
   export OPENSEARCH_JAVA_HOME=/usr/share/wazuh-indexer/jdk
