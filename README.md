@@ -69,6 +69,7 @@ DOCKERFILE=Dockerfile.xfce.amd64.chainguard TAG_SUFFIX=cg PUSH=0 ./build-amd64-i
 Phase 2 runtime replacement planning:
 
 - [docs/phase2-base-image-migration.md](docs/phase2-base-image-migration.md)
+- [docs/zarf-dev-stage.md](docs/zarf-dev-stage.md)
 
 Phase 2 acceptance gate command:
 
@@ -105,6 +106,13 @@ Phase 2 matrix evaluation (report + logs):
 
 ```sh
 ./scripts/evaluate-phase2-matrix.sh
+```
+
+Zarf dev-stage package validation:
+
+```sh
+zarf package create deploy/zarf --confirm
+zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --confirm
 ```
 
 ## First Milestone: Local SOC Baseline

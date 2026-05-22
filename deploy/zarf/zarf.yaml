@@ -1,0 +1,47 @@
+kind: ZarfPackageConfig
+metadata:
+  name: nexus-webtop-soc-dev
+  version: 0.1.0
+  description: >
+    Dev-stage Zarf package for Nexus Webtop SOC baseline assets and image mirrors.
+    This package validates packaging and image transport before Kubernetes deployment work.
+
+components:
+  - name: soc-baseline-images
+    required: true
+    description: Mirror baseline SOC images used by compose and phase2 evaluation.
+    images:
+      - docker.io/wazuh/wazuh-manager:4.12.0
+      - docker.io/wazuh/wazuh-indexer:4.12.0
+      - docker.io/wazuh/wazuh-dashboard:4.12.0
+      - docker.io/jasonish/suricata:8.0
+      - docker.io/busybox:1.36
+      - docker.io/phoenixvlabs/nexus-webtop-soc:amd64-cg-latest
+      - docker.io/phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest
+
+  - name: soc-baseline-assets
+    required: true
+    description: Package compose baseline, scripts, and docs for local/offline use.
+    files:
+      - source: ../../deploy/compose/soc-baseline.yml
+        target: soc-baseline.yml
+      - source: ../../scripts/bootstrap-wazuh-security.sh
+        target: scripts/bootstrap-wazuh-security.sh
+      - source: ../../scripts/validate-analyst-image.sh
+        target: scripts/validate-analyst-image.sh
+      - source: ../../scripts/evaluate-phase2-matrix.sh
+        target: scripts/evaluate-phase2-matrix.sh
+      - source: ../../docs/soc-baseline.md
+        target: docs/soc-baseline.md
+      - source: ../../docs/phase2-base-image-migration.md
+        target: docs/phase2-base-image-migration.md
+
+  - name: stage-notes
+    required: true
+    actions:
+      onDeploy:
+        after:
+          - cmd: |
+              echo "Zarf stage: dev packaging validation."
+              echo "Current runtime remains compose-based."
+              echo "Next stage is Kubernetes manifest packaging for Zarf deploy."
