@@ -187,7 +187,7 @@ The baseline compose stack uses intentionally simple credentials for Phase 1 lab
 | Suricata sensor | jasonish/suricata | 7.0 | Pinned in compose |
 | Suricata forwarder | busybox | 1.36 | Lightweight tail+nc bridge |
 | Analyst desktop (default) | linuxserver/webtop | amd64-ubuntu-xfce | Used by Dockerfile.xfce.amd64 |
-| Phase 2a candidate base | cgr.dev/chainguard/wolfi-base | latest | Used by Dockerfile.phase2a.amd64 |
+| Phase 2a candidate base | cgr.dev/chainguard/wolfi-base | latest | Used by Dockerfile.runtime-a.amd64 |
 
 > [!NOTE]
 > Chainguard images listed in section 3 (Wazuh manager, indexer, dashboard, agent) are aspirational targets. As of this writing, Chainguard does not publish dedicated Wazuh application images. The `cg` track in this repo uses the LinuxServer base with reduced package footprint as a transition step, not a true Chainguard runtime.

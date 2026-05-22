@@ -68,7 +68,7 @@ DOCKERFILE=Dockerfile.xfce.amd64.chainguard TAG_SUFFIX=cg PUSH=0 ./build-amd64-i
 
 Phase 2 runtime replacement planning:
 
-- [docs/phase2-base-image-migration.md](docs/phase2-base-image-migration.md)
+- [docs/base-image-migration.md](docs/base-image-migration.md)
 - [docs/zarf-dev-stage.md](docs/zarf-dev-stage.md)
 
 Phase 2 acceptance gate command:
@@ -92,13 +92,13 @@ ACTIVE_DESKTOP_REQUIRED=1 ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate
 Phase 2 candidate wrapper (build + acceptance gate):
 
 ```sh
-DOCKERFILE=Dockerfile.phase2a.amd64 TAG_SUFFIX=phase2a PUSH=0 ./scripts/run-phase2-candidate.sh
+DOCKERFILE=Dockerfile.runtime-a.amd64 TAG_SUFFIX=phase2a PUSH=0 ./scripts/run-runtime-candidate.sh
 ```
 
 Phase 2b strict desktop-marker candidate:
 
 ```sh
-DOCKERFILE=Dockerfile.phase2b.amd64 TAG_SUFFIX=phase2b PUSH=0 ./scripts/run-phase2-candidate.sh
+DOCKERFILE=Dockerfile.runtime-b.amd64 TAG_SUFFIX=phase2b PUSH=0 ./scripts/run-runtime-candidate.sh
 DESKTOP_REQUIRED=1 ANALYST_IMAGE=phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest ./scripts/validate-analyst-image.sh
 ```
 

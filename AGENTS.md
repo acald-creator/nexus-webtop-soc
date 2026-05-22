@@ -21,17 +21,17 @@ those services for a full SOC baseline environment.
 |------|---------|
 | `Dockerfile.xfce.amd64` | Primary analyst desktop image (LinuxServer XFCE base) |
 | `Dockerfile.xfce.amd64.chainguard` | Experimental Chainguard transition track (still LinuxServer base) |
-| `Dockerfile.phase2a.amd64` | Phase 2a candidate: first non-LinuxServer runtime (wolfi-base, nginx placeholder, no desktop) |
+| `Dockerfile.runtime-a.amd64` | Phase 2a candidate: first non-LinuxServer runtime (wolfi-base, nginx placeholder, no desktop) |
 | `build-amd64-image.sh` | Build helper for all Dockerfiles |
 | `deploy/compose/soc-baseline.yml` | Full SOC baseline compose stack (Wazuh + Suricata + analyst webtop) |
 | `deploy/suricata/suricata.yaml` | Suricata sensor configuration |
 | `scripts/bootstrap-wazuh-security.sh` | Initializes OpenSearch security config in indexer after a fresh `down -v` |
 | `scripts/validate-analyst-image.sh` | Acceptance gate: healthchecks, curl, tool availability, optional desktop markers |
-| `scripts/run-phase2-candidate.sh` | Build + validate wrapper for Phase 2 candidates |
+| `scripts/run-runtime-candidate.sh` | Build + validate wrapper for Phase 2 candidates |
 | `scripts/evaluate-phase2-matrix.sh` | Runs all candidate scenarios and generates report to `docs/reports/` |
 | `architecture.md` | Canonical architecture guide (**source of truth**) |
 | `docs/soc-baseline.md` | SOC baseline operations guide |
-| `docs/phase2-base-image-migration.md` | Phase 2 migration plan and candidate evaluation |
+| `docs/base-image-migration.md` | Phase 2 migration plan and candidate evaluation |
 | `docs/reports/phase2-evaluation-latest.md` | Latest matrix evaluation results |
 
 ---
@@ -120,7 +120,7 @@ ANALYST_IMAGE=<image:tag> ./scripts/validate-analyst-image.sh
 - When adding a new Phase 2 candidate:
   1. Create a new `Dockerfile.<desktop>.<arch>.<variant>`.
   2. Add an entry to the `rows` array in `scripts/evaluate-phase2-matrix.sh`.
-  3. Document the candidate in `docs/phase2-base-image-migration.md`.
+  3. Document the candidate in `docs/base-image-migration.md`.
 
 ---
 

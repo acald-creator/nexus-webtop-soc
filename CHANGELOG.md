@@ -21,12 +21,12 @@ All notable changes to this project are documented in this file.
 - Suricata sensor configuration (`deploy/suricata/suricata.yaml`).
 - Security bootstrap script (`scripts/bootstrap-wazuh-security.sh`).
 - Analyst image acceptance gate (`scripts/validate-analyst-image.sh`).
-- Phase 2 candidate build+validate wrapper (`scripts/run-phase2-candidate.sh`).
-- Phase 2a candidate Dockerfile (`Dockerfile.phase2a.amd64`) — first non-LinuxServer runtime baseline.
+- Phase 2 candidate build+validate wrapper (`scripts/run-runtime-candidate.sh`).
+- Phase 2a candidate Dockerfile (`Dockerfile.runtime-a.amd64`) — first non-LinuxServer runtime baseline.
 - Chainguard transition Dockerfile (`Dockerfile.xfce.amd64.chainguard`).
 - Architecture proposal (`architecture.md`).
 - SOC baseline operations guide (`docs/soc-baseline.md`).
-- Phase 2 base image migration plan (`docs/phase2-base-image-migration.md`).
+- Phase 2 base image migration plan (`docs/base-image-migration.md`).
 
 ### Changed
 - README.md rewritten to reflect SOC split architecture and legacy webtop role.

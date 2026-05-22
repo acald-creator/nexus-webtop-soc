@@ -24,11 +24,11 @@ When reviewing security, these are the current credential touchpoints:
 
 | Concern | Files |
 |---------|-------|
-| Analyst desktop | `Dockerfile.xfce.amd64`, `Dockerfile.xfce.amd64.chainguard`, `Dockerfile.phase2a.amd64` |
+| Analyst desktop | `Dockerfile.xfce.amd64`, `Dockerfile.xfce.amd64.chainguard`, `Dockerfile.runtime-a.amd64` |
 | SOC infrastructure | `deploy/compose/soc-baseline.yml`, `deploy/suricata/suricata.yaml` |
 | Operations/bootstrap | `scripts/bootstrap-wazuh-security.sh`, `scripts/validate-analyst-image.sh` |
-| Evaluation | `scripts/evaluate-phase2-matrix.sh`, `scripts/run-phase2-candidate.sh`, `docs/reports/` |
-| Architecture decisions | `architecture.md`, `docs/phase2-base-image-migration.md` |
+| Evaluation | `scripts/evaluate-phase2-matrix.sh`, `scripts/run-runtime-candidate.sh`, `docs/reports/` |
+| Architecture decisions | `architecture.md`, `docs/base-image-migration.md` |
 
 ### Expected Output Format
 

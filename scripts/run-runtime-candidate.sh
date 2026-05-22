@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DOCKERFILE="${DOCKERFILE:-Dockerfile.phase2a.amd64}"
-TAG_SUFFIX="${TAG_SUFFIX:-phase2a}"
+DOCKERFILE="${DOCKERFILE:-Dockerfile.runtime-a.amd64}"
+TAG_SUFFIX="${TAG_SUFFIX:-runtime-a}"
 REPO="${REPO:-phoenixvlabs/nexus-webtop-soc}"
 PUSH="${PUSH:-0}"
 TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-180}"

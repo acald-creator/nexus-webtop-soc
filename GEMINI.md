@@ -24,7 +24,7 @@ Evaluate upgrades and alternatives against these current pins:
 
 ### Evaluation Criteria
 
-When comparing image options, score against the criteria defined in `docs/phase2-base-image-migration.md`:
+When comparing image options, score against the criteria defined in `docs/base-image-migration.md`:
 
 - Analyst UX parity
 - Compose profile compatibility

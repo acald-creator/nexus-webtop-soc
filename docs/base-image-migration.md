@@ -22,7 +22,7 @@ Pick one Phase 2 target path:
 
 ## Current Decision
 
-The Phase 2a candidate (`Dockerfile.phase2a.amd64`) follows **Option 2**: replace runtime with a custom minimal desktop stack on a hardened base.
+The Phase 2a candidate (`Dockerfile.runtime-a.amd64`) follows **Option 2**: replace runtime with a custom minimal desktop stack on a hardened base.
 
 The `phase2a` candidate uses `cgr.dev/chainguard/wolfi-base` as the runtime base with nginx serving a placeholder page on port 3000. It validates the build, publish, and compose integration path without claiming desktop parity.
 
@@ -104,7 +104,7 @@ To add a new Phase 2 candidate:
 
 1. Create a new Dockerfile following the naming convention: `Dockerfile.<candidate-id>.amd64`
 2. Add an entry to the `rows` array in `scripts/evaluate-phase2-matrix.sh` with scenario name, image reference, desktop-required flag, and expected outcome
-3. Test locally: `DOCKERFILE=Dockerfile.<id>.amd64 TAG_SUFFIX=<id> PUSH=0 ./scripts/run-phase2-candidate.sh`
+3. Test locally: `DOCKERFILE=Dockerfile.<id>.amd64 TAG_SUFFIX=<id> PUSH=0 ./scripts/run-runtime-candidate.sh`
 4. Run the full matrix: `./scripts/evaluate-phase2-matrix.sh`
 5. Document findings in this file under a new subsection
 
@@ -114,14 +114,14 @@ Create the first true non-LinuxServer candidate Dockerfile and run the acceptanc
 
 Current scaffold:
 
-- Candidate Dockerfile: `Dockerfile.phase2a.amd64`
-- Candidate Dockerfile: `Dockerfile.phase2b.amd64`
-- Build + gate wrapper: `scripts/run-phase2-candidate.sh`
+- Candidate Dockerfile: `Dockerfile.runtime-a.amd64`
+- Candidate Dockerfile: `Dockerfile.runtime-b.amd64`
+- Build + gate wrapper: `scripts/run-runtime-candidate.sh`
 
 Run:
 
 ```sh
-DOCKERFILE=Dockerfile.phase2a.amd64 TAG_SUFFIX=phase2a PUSH=0 ./scripts/run-phase2-candidate.sh
+DOCKERFILE=Dockerfile.runtime-a.amd64 TAG_SUFFIX=phase2a PUSH=0 ./scripts/run-runtime-candidate.sh
 ```
 
 Note: `phase2a` is currently a runtime-plumbing candidate and does not claim XFCE analyst parity yet. The wrapper sets `DESKTOP_REQUIRED=0` by default.

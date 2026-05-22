@@ -31,8 +31,8 @@ components:
         target: scripts/evaluate-phase2-matrix.sh
       - source: ../../docs/soc-baseline.md
         target: docs/soc-baseline.md
-      - source: ../../docs/phase2-base-image-migration.md
-        target: docs/phase2-base-image-migration.md
+      - source: ../../docs/base-image-migration.md
+        target: docs/base-image-migration.md
 
   - name: phase2-kubernetes-scaffold
     required: false
