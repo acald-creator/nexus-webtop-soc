@@ -8,6 +8,6 @@ resources:
 configMapGenerator:
   - name: suricata-config
     files:
-      - suricata.yaml=../suricata/suricata.yaml
+      - suricata.yaml=suricata.yaml
 generatorOptions:
   disableNameSuffixHash: true

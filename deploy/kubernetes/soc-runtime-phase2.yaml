@@ -10,6 +10,17 @@ spec:
       storage: 20Gi
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: wazuh-auth
+type: Opaque
+stringData:
+  indexer-username: admin
+  indexer-password: admin
+  dashboard-username: admin
+  dashboard-password: admin
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: wazuh-manager-data
@@ -75,10 +86,11 @@ spec:
           env:
             - name: OPENSEARCH_JAVA_OPTS
               value: "-Xms1g -Xmx1g"
-            - name: bootstrap.memory_lock
-              value: "true"
-            - name: discovery.type
-              value: "single-node"
+          args:
+            - -E
+            - bootstrap.memory_lock=true
+            - -E
+            - discovery.type=single-node
           livenessProbe:
             tcpSocket:
               port: 9200
@@ -135,9 +147,15 @@ spec:
             - name: INDEXER_URL
               value: "https://wazuh-indexer:9200"
             - name: INDEXER_USERNAME
-              value: "admin"
+              valueFrom:
+                secretKeyRef:
+                  name: wazuh-auth
+                  key: indexer-username
             - name: INDEXER_PASSWORD
-              value: "admin"
+              valueFrom:
+                secretKeyRef:
+                  name: wazuh-auth
+                  key: indexer-password
             - name: FILEBEAT_SSL_VERIFICATION_MODE
               value: "none"
             - name: SSL_CERTIFICATE_AUTHORITIES
@@ -212,15 +230,27 @@ spec:
             - name: INDEXER_URL
               value: "https://wazuh-indexer:9200"
             - name: INDEXER_USERNAME
-              value: "admin"
+              valueFrom:
+                secretKeyRef:
+                  name: wazuh-auth
+                  key: indexer-username
             - name: INDEXER_PASSWORD
-              value: "admin"
+              valueFrom:
+                secretKeyRef:
+                  name: wazuh-auth
+                  key: indexer-password
             - name: WAZUH_API_URL
               value: "https://wazuh-manager"
             - name: DASHBOARD_USERNAME
-              value: "admin"
+              valueFrom:
+                secretKeyRef:
+                  name: wazuh-auth
+                  key: dashboard-username
             - name: DASHBOARD_PASSWORD
-              value: "admin"
+              valueFrom:
+                secretKeyRef:
+                  name: wazuh-auth
+                  key: dashboard-password
             - name: SERVER_SSL_ENABLED
               value: "false"
           livenessProbe:
