@@ -59,7 +59,7 @@ metadata:
   name: suricata-logs
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi
@@ -86,11 +86,6 @@ spec:
           env:
             - name: OPENSEARCH_JAVA_OPTS
               value: "-Xms1g -Xmx1g"
-          args:
-            - -E
-            - bootstrap.memory_lock=true
-            - -E
-            - discovery.type=single-node
           livenessProbe:
             tcpSocket:
               port: 9200
