@@ -115,16 +115,35 @@ zarf package create deploy/zarf --confirm
 zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --confirm
 ```
 
-Optional Phase 2 Kubernetes scaffold deploy:
+Optional runtime Kubernetes scaffold deploy:
 
 ```sh
-zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --components phase2-kubernetes-scaffold --confirm
+zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --components runtime-kubernetes-scaffold --confirm
 ```
 
 Local manifest preview:
 
 ```sh
 kubectl kustomize deploy/kubernetes
+```
+
+Local overlay apply (includes lab `wazuh-auth` secret defaults):
+
+```sh
+kubectl apply -k deploy/kubernetes/overlays/local
+```
+
+Production overlay prep:
+
+```sh
+cp deploy/kubernetes/overlays/prod/secrets/wazuh-auth.env.example \
+  deploy/kubernetes/overlays/prod/secrets/wazuh-auth.env
+```
+
+Then apply:
+
+```sh
+kubectl apply -k deploy/kubernetes/overlays/prod
 ```
 
 ## First Milestone: Local SOC Baseline

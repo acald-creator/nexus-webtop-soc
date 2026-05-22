@@ -31,10 +31,10 @@ Deploy the generated package:
 zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --confirm
 ```
 
-Deploy only the optional Phase 2 Kubernetes scaffold component:
+Deploy only the optional runtime Kubernetes scaffold component:
 
 ```sh
-zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --components phase2-kubernetes-scaffold --confirm
+zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --components runtime-kubernetes-scaffold --confirm
 ```
 
 ## What This Confirms
@@ -47,4 +47,7 @@ zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --comp
 
 ## Next Stage
 
-Add Kubernetes manifests (or generated manifests) for SOC services and convert this package from dev packaging validation to deployable runtime packaging.
+Add Kubernetes manifests (or generated manifests) for SOC services, then promote overlay-driven deployment:
+
+- `deploy/kubernetes/overlays/local` for local/lab defaults
+- `deploy/kubernetes/overlays/prod` for secret-injected production rollout

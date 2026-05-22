@@ -10,17 +10,6 @@ spec:
       storage: 20Gi
 ---
 apiVersion: v1
-kind: Secret
-metadata:
-  name: wazuh-auth
-type: Opaque
-stringData:
-  indexer-username: admin
-  indexer-password: admin
-  dashboard-username: admin
-  dashboard-password: admin
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: wazuh-manager-data

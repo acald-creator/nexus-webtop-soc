@@ -34,11 +34,11 @@ components:
       - source: ../../docs/base-image-migration.md
         target: docs/base-image-migration.md
 
-  - name: phase2-kubernetes-scaffold
+  - name: runtime-kubernetes-scaffold
     required: false
-    description: Optional Phase 2 scaffold for Kubernetes manifest packaging tests.
+    description: Optional runtime scaffold for Kubernetes manifest packaging tests.
     manifests:
-      - name: phase2-k8s-scaffold
+      - name: runtime-k8s-scaffold
         namespace: nexus-soc
         kustomizations:
           - ../../deploy/kubernetes
@@ -46,7 +46,7 @@ components:
       onDeploy:
         after:
           - cmd: |
-              echo "Phase 2 Kubernetes scaffold deployed."
+              echo "Runtime Kubernetes scaffold deployed."
               echo "This is placeholder packaging validation, not full SOC runtime cutover."
 
   - name: stage-notes
