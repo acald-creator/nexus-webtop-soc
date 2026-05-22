@@ -4,3 +4,10 @@ namespace: nexus-soc
 resources:
   - namespace.yaml
   - phase2-placeholder-configmap.yaml
+  - soc-runtime-phase2.yaml
+configMapGenerator:
+  - name: suricata-config
+    files:
+      - suricata.yaml=../suricata/suricata.yaml
+generatorOptions:
+  disableNameSuffixHash: true

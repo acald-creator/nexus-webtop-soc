@@ -43,6 +43,7 @@ zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --comp
 - Core SOC baseline assets are bundled consistently
 - Team can execute repeatable offline package create/deploy loops
 - Kubernetes packaging flow is wired for Phase 2 using placeholder manifests
+- Initial Kubernetes runtime skeleton is present for Wazuh and Suricata migration iteration
 
 ## Next Stage
 

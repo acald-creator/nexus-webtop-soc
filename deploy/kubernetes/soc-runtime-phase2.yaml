@@ -1,0 +1,320 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wazuh-indexer-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wazuh-manager-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wazuh-manager-etc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wazuh-manager-logs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: suricata-logs
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wazuh-indexer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wazuh-indexer
+  template:
+    metadata:
+      labels:
+        app: wazuh-indexer
+    spec:
+      containers:
+        - name: wazuh-indexer
+          image: wazuh/wazuh-indexer:4.7.5
+          ports:
+            - containerPort: 9200
+          env:
+            - name: OPENSEARCH_JAVA_OPTS
+              value: "-Xms1g -Xmx1g"
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: discovery.type
+              value: "single-node"
+          livenessProbe:
+            tcpSocket:
+              port: 9200
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 9200
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          volumeMounts:
+            - name: wazuh-indexer-data
+              mountPath: /var/lib/wazuh-indexer
+      volumes:
+        - name: wazuh-indexer-data
+          persistentVolumeClaim:
+            claimName: wazuh-indexer-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wazuh-indexer
+spec:
+  selector:
+    app: wazuh-indexer
+  ports:
+    - name: http
+      port: 9200
+      targetPort: 9200
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wazuh-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wazuh-manager
+  template:
+    metadata:
+      labels:
+        app: wazuh-manager
+    spec:
+      containers:
+        - name: wazuh-manager
+          image: wazuh/wazuh-manager:4.7.5
+          ports:
+            - containerPort: 1514
+              protocol: UDP
+            - containerPort: 1515
+            - containerPort: 55000
+          env:
+            - name: INDEXER_URL
+              value: "https://wazuh-indexer:9200"
+            - name: INDEXER_USERNAME
+              value: "admin"
+            - name: INDEXER_PASSWORD
+              value: "admin"
+            - name: FILEBEAT_SSL_VERIFICATION_MODE
+              value: "none"
+            - name: SSL_CERTIFICATE_AUTHORITIES
+              value: ""
+          livenessProbe:
+            tcpSocket:
+              port: 55000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 55000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          volumeMounts:
+            - name: wazuh-manager-data
+              mountPath: /var/ossec/data
+            - name: wazuh-manager-etc
+              mountPath: /var/ossec/etc
+            - name: wazuh-manager-logs
+              mountPath: /var/ossec/logs
+      volumes:
+        - name: wazuh-manager-data
+          persistentVolumeClaim:
+            claimName: wazuh-manager-data
+        - name: wazuh-manager-etc
+          persistentVolumeClaim:
+            claimName: wazuh-manager-etc
+        - name: wazuh-manager-logs
+          persistentVolumeClaim:
+            claimName: wazuh-manager-logs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wazuh-manager
+spec:
+  selector:
+    app: wazuh-manager
+  ports:
+    - name: events-udp
+      port: 1514
+      targetPort: 1514
+      protocol: UDP
+    - name: registration
+      port: 1515
+      targetPort: 1515
+    - name: api
+      port: 55000
+      targetPort: 55000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wazuh-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wazuh-dashboard
+  template:
+    metadata:
+      labels:
+        app: wazuh-dashboard
+    spec:
+      containers:
+        - name: wazuh-dashboard
+          image: wazuh/wazuh-dashboard:4.7.5
+          ports:
+            - containerPort: 5601
+          env:
+            - name: INDEXER_URL
+              value: "https://wazuh-indexer:9200"
+            - name: INDEXER_USERNAME
+              value: "admin"
+            - name: INDEXER_PASSWORD
+              value: "admin"
+            - name: WAZUH_API_URL
+              value: "https://wazuh-manager"
+            - name: DASHBOARD_USERNAME
+              value: "admin"
+            - name: DASHBOARD_PASSWORD
+              value: "admin"
+            - name: SERVER_SSL_ENABLED
+              value: "false"
+          livenessProbe:
+            tcpSocket:
+              port: 5601
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            tcpSocket:
+              port: 5601
+            initialDelaySeconds: 30
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wazuh-dashboard
+spec:
+  selector:
+    app: wazuh-dashboard
+  ports:
+    - name: http
+      port: 5601
+      targetPort: 5601
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: suricata-sensor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: suricata-sensor
+  template:
+    metadata:
+      labels:
+        app: suricata-sensor
+    spec:
+      containers:
+        - name: suricata-sensor
+          image: jasonish/suricata:7.0
+          command:
+            - suricata
+            - -i
+            - eth0
+            - -c
+            - /etc/suricata/suricata.yaml
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+          volumeMounts:
+            - name: suricata-config
+              mountPath: /etc/suricata/suricata.yaml
+              subPath: suricata.yaml
+            - name: suricata-logs
+              mountPath: /var/log/suricata
+      volumes:
+        - name: suricata-config
+          configMap:
+            name: suricata-config
+        - name: suricata-logs
+          persistentVolumeClaim:
+            claimName: suricata-logs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: suricata-forwarder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: suricata-forwarder
+  template:
+    metadata:
+      labels:
+        app: suricata-forwarder
+    spec:
+      containers:
+        - name: suricata-forwarder
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - |
+              touch /var/log/suricata/eve.json
+              tail -F /var/log/suricata/eve.json | nc -u wazuh-manager 1514
+          volumeMounts:
+            - name: suricata-logs
+              mountPath: /var/log/suricata
+      volumes:
+        - name: suricata-logs
+          persistentVolumeClaim:
+            claimName: suricata-logs

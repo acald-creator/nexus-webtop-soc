@@ -121,6 +121,12 @@ Optional Phase 2 Kubernetes scaffold deploy:
 zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --components phase2-kubernetes-scaffold --confirm
 ```
 
+Local manifest preview:
+
+```sh
+kubectl kustomize deploy/kubernetes
+```
+
 ## First Milestone: Local SOC Baseline
 
 The first practical milestone is now captured in:
