@@ -1,4 +1,4 @@
-# Phase 2: Base Image Migration Plan
+# Runtime Base Image Migration Plan
 
 This document defines how to move the analyst image from the current LinuxServer runtime toward a hardened base strategy with repeatable acceptance checks.
 
@@ -22,17 +22,17 @@ Pick one Phase 2 target path:
 
 ## Current Decision
 
-The Phase 2a candidate (`Dockerfile.runtime-a.amd64`) follows **Option 2**: replace runtime with a custom minimal desktop stack on a hardened base.
+The runtime-a candidate (`Dockerfile.runtime-a.amd64`) follows **Option 2**: replace runtime with a custom minimal desktop stack on a hardened base.
 
-The `phase2a` candidate uses `cgr.dev/chainguard/wolfi-base` as the runtime base with nginx serving a placeholder page on port 3000. It validates the build, publish, and compose integration path without claiming desktop parity.
+The `runtime-a` candidate uses `cgr.dev/chainguard/wolfi-base` as the runtime base with nginx serving a placeholder page on port 3000. It validates the build, publish, and compose integration path without claiming desktop parity.
 
 Matrix evaluation results (`docs/reports/runtime-evaluation-latest.md`) confirm:
 
-- `phase2a` passes plumbing checks (`DESKTOP_REQUIRED=0`)
-- `phase2a` correctly fails desktop-required checks (`DESKTOP_REQUIRED=1`)
+- `runtime-a` passes plumbing checks (`DESKTOP_REQUIRED=0`)
+- `runtime-a` correctly fails desktop-required checks (`DESKTOP_REQUIRED=1`)
 - The Chainguard transition track (`cg`) passes all checks including desktop markers
 
-Next step: build a `phase2b` candidate that adds a minimal web desktop session to the wolfi-base runtime.
+Next step: build a `runtime-b` candidate that adds a minimal web desktop session to the wolfi-base runtime.
 
 ## Candidate Evaluation Criteria
 
@@ -110,7 +110,7 @@ To add a new Phase 2 candidate:
 
 ## Recommended Immediate Next Step
 
-Create the first true non-LinuxServer candidate Dockerfile and run the acceptance gate using a dedicated tag suffix (for example `phase2a`).
+Create the first true non-LinuxServer candidate Dockerfile and run the acceptance gate using a dedicated tag suffix (for example `runtime-a`).
 
 Current scaffold:
 
@@ -121,9 +121,9 @@ Current scaffold:
 Run:
 
 ```sh
-DOCKERFILE=Dockerfile.runtime-a.amd64 TAG_SUFFIX=phase2a PUSH=0 ./scripts/run-runtime-candidate.sh
+DOCKERFILE=Dockerfile.runtime-a.amd64 TAG_SUFFIX=runtime-a PUSH=0 ./scripts/run-runtime-candidate.sh
 ```
 
-Note: `phase2a` is currently a runtime-plumbing candidate and does not claim XFCE analyst parity yet. The wrapper sets `DESKTOP_REQUIRED=0` by default.
+Note: `runtime-a` is currently a runtime-plumbing candidate and does not claim XFCE analyst parity yet. The wrapper sets `DESKTOP_REQUIRED=0` by default.
 
-`phase2b` adds an explicit desktop marker package (`openbox`) for strict desktop-capability gate validation.
+`runtime-b` adds an explicit desktop marker package (`openbox`) for strict desktop-capability gate validation.

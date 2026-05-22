@@ -15,7 +15,7 @@ Runtime remains compose-driven while Kubernetes manifests are prepared.
 
 ## When to Run This
 
-Run this after Phase 2 candidate validation is stable (for example `cg` and `phase2b` image tracks) and before Kubernetes packaging.
+Run this after runtime candidate validation is stable (for example `cg` and `runtime-b` image tracks) and before Kubernetes packaging.
 
 ## Commands
 
@@ -42,7 +42,7 @@ zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --comp
 - Required images can be mirrored and bundled
 - Core SOC baseline assets are bundled consistently
 - Team can execute repeatable offline package create/deploy loops
-- Kubernetes packaging flow is wired for Phase 2 using placeholder manifests
+- Kubernetes packaging flow is wired for runtime promotion using placeholder manifests
 - Initial Kubernetes runtime skeleton is present for Wazuh and Suricata migration iteration
 
 ## Next Stage

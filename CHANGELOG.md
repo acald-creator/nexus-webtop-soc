@@ -7,6 +7,24 @@ All notable changes to this project are documented in this file.
 - Phase 2a candidate passing plumbing checks; desktop parity not yet achieved.
 - Chainguard transition track (`cg`) passing all acceptance gate checks.
 
+## 2026-05-22
+
+### Added
+- Kubernetes base/overlay layout:
+  - `deploy/kubernetes/base`
+  - `deploy/kubernetes/overlays/local`
+  - `deploy/kubernetes/overlays/prod`
+- Production secret template: `deploy/kubernetes/overlays/prod/secrets/wazuh-auth.env.example`.
+- Baseline NetworkPolicies for `nexus-soc`:
+  - default deny ingress
+  - intra-namespace allow
+  - explicit ingress for Wazuh dashboard and manager service ports.
+
+### Changed
+- Kubernetes manifests moved to overlay-first secret flow; inline `wazuh-auth` removed from base manifests.
+- `wazuh-indexer` rollout stability improved with tuned probes and `Recreate` strategy for single-writer data-path safety.
+- Runtime naming cleanup completed across scripts/docs (`evaluate-runtime-matrix.sh`, `runtime-evaluation-latest.md`).
+
 ## 2026-05-21
 
 ### Added

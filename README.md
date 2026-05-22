@@ -89,20 +89,20 @@ To enforce active desktop session checks:
 ACTIVE_DESKTOP_REQUIRED=1 ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate-analyst-image.sh
 ```
 
-Phase 2 candidate wrapper (build + acceptance gate):
+Runtime candidate wrapper (build + acceptance gate):
 
 ```sh
-DOCKERFILE=Dockerfile.runtime-a.amd64 TAG_SUFFIX=phase2a PUSH=0 ./scripts/run-runtime-candidate.sh
+DOCKERFILE=Dockerfile.runtime-a.amd64 TAG_SUFFIX=runtime-a PUSH=0 ./scripts/run-runtime-candidate.sh
 ```
 
-Phase 2b strict desktop-marker candidate:
+Runtime-b strict desktop-marker candidate:
 
 ```sh
-DOCKERFILE=Dockerfile.runtime-b.amd64 TAG_SUFFIX=phase2b PUSH=0 ./scripts/run-runtime-candidate.sh
-DESKTOP_REQUIRED=1 ANALYST_IMAGE=phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest ./scripts/validate-analyst-image.sh
+DOCKERFILE=Dockerfile.runtime-b.amd64 TAG_SUFFIX=runtime-b PUSH=0 ./scripts/run-runtime-candidate.sh
+DESKTOP_REQUIRED=1 ANALYST_IMAGE=phoenixvlabs/nexus-webtop-soc:amd64-runtime-b-latest ./scripts/validate-analyst-image.sh
 ```
 
-Phase 2 matrix evaluation (report + logs):
+Runtime matrix evaluation (report + logs):
 
 ```sh
 ./scripts/evaluate-runtime-matrix.sh
@@ -145,6 +145,16 @@ Then apply:
 ```sh
 kubectl apply -k deploy/kubernetes/overlays/prod
 ```
+
+Kubernetes runtime notes:
+
+- Base manifests are in `deploy/kubernetes/base`; apply overlays for environment-specific secret handling.
+- `wazuh-indexer` uses `Recreate` strategy to avoid conflicting concurrent pods on the same data path.
+- Baseline `NetworkPolicy` objects are enabled:
+  - `default-deny-ingress`
+  - `allow-intra-namespace`
+  - `allow-wazuh-dashboard-ingress`
+  - `allow-wazuh-manager-ingress`
 
 ## First Milestone: Local SOC Baseline
 
