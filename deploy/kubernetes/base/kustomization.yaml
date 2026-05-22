@@ -5,6 +5,7 @@ resources:
   - namespace.yaml
   - soc-runtime-plan-configmap.yaml
   - soc-runtime.yaml
+  - networkpolicy.yaml
 configMapGenerator:
   - name: suricata-config
     files:

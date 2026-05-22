@@ -75,6 +75,13 @@ spec:
           env:
             - name: OPENSEARCH_JAVA_OPTS
               value: "-Xms1g -Xmx1g"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
           livenessProbe:
             tcpSocket:
               port: 9200
@@ -144,6 +151,13 @@ spec:
               value: "none"
             - name: SSL_CERTIFICATE_AUTHORITIES
               value: ""
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
           livenessProbe:
             tcpSocket:
               port: 55000
@@ -237,6 +251,13 @@ spec:
                   key: dashboard-password
             - name: SERVER_SSL_ENABLED
               value: "false"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
           livenessProbe:
             tcpSocket:
               port: 5601
@@ -288,6 +309,13 @@ spec:
               add:
                 - NET_ADMIN
                 - NET_RAW
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
           volumeMounts:
             - name: suricata-config
               mountPath: /etc/suricata/suricata.yaml
@@ -325,6 +353,13 @@ spec:
             - |
               touch /var/log/suricata/eve.json
               tail -F /var/log/suricata/eve.json | nc -u wazuh-manager 1514
+          resources:
+            requests:
+              cpu: "25m"
+              memory: "32Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
           volumeMounts:
             - name: suricata-logs
               mountPath: /var/log/suricata
