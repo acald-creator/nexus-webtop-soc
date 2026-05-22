@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: phase2-soc-runtime-plan
+  namespace: nexus-soc
+  labels:
+    app.kubernetes.io/name: phase2-soc-runtime-plan
+    app.kubernetes.io/part-of: nexus-webtop-soc
+data:
+  status: "placeholder"
+  note: "Phase 2 Kubernetes runtime manifests will replace this placeholder."
+  next_targets: "wazuh-indexer,wazuh-manager,wazuh-dashboard,suricata-sensor,suricata-forwarder"
