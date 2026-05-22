@@ -8,6 +8,8 @@ At this stage, Zarf is used to validate:
 - packaging of compose baseline files and validation scripts
 - offline transport workflow readiness
 
+Current scope excludes private analyst image tags (`phoenixvlabs/nexus-webtop-soc:*`) to keep dev-stage packaging reproducible across environments.
+
 At this stage, Zarf is **not yet** the runtime deployment method for SOC services in this repo.
 Runtime remains compose-driven while Kubernetes manifests are prepared.
 
