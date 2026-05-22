@@ -2,7 +2,7 @@
 #
 # evaluate-runtime-matrix.sh
 #
-# Runs all Phase 2 candidate scenarios through the acceptance gate and
+# Runs all runtime candidate scenarios through the acceptance gate and
 # generates a markdown report with pass/fail results.
 #
 # Usage:
@@ -38,14 +38,14 @@ mkdir -p "${REPORT_DIR}"
 
 rows=(
   "cg-desktop-active|phoenixvlabs/nexus-webtop-soc:amd64-cg-latest|1|1|pass"
-  "phase2a-desktop-active|phoenixvlabs/nexus-webtop-soc:amd64-phase2a-latest|1|1|fail"
-  "phase2a-plumbing|phoenixvlabs/nexus-webtop-soc:amd64-phase2a-latest|0|0|pass"
-  "phase2b-desktop-active|phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest|1|1|pass"
-  "phase2b-marker-only|phoenixvlabs/nexus-webtop-soc:amd64-phase2b-latest|1|0|pass"
+  "runtime-a-desktop-active|phoenixvlabs/nexus-webtop-soc:amd64-runtime-a-latest|1|1|fail"
+  "runtime-a-plumbing|phoenixvlabs/nexus-webtop-soc:amd64-runtime-a-latest|0|0|pass"
+  "runtime-b-desktop-active|phoenixvlabs/nexus-webtop-soc:amd64-runtime-b-latest|1|1|pass"
+  "runtime-b-marker-only|phoenixvlabs/nexus-webtop-soc:amd64-runtime-b-latest|1|0|pass"
 )
 
 {
-  echo "# Phase 2 Candidate Evaluation"
+  echo "# Runtime Candidate Evaluation"
   echo
   echo "- Generated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
   echo "- Host: $(hostname)"
