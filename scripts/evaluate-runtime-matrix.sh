@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 #
-# evaluate-phase2-matrix.sh
+# evaluate-runtime-matrix.sh
 #
 # Runs all Phase 2 candidate scenarios through the acceptance gate and
 # generates a markdown report with pass/fail results.
 #
 # Usage:
-#   ./scripts/evaluate-phase2-matrix.sh
+#   ./scripts/evaluate-runtime-matrix.sh
 #
 # Environment:
 #   REPORT_DIR       Output directory for report and logs (default: docs/reports)
-#   REPORT_FILE      Report filename (default: docs/reports/phase2-evaluation-latest.md)
+#   REPORT_FILE      Report filename (default: docs/reports/runtime-evaluation-latest.md)
 #   TIMEOUT_SECONDS  Healthcheck timeout per scenario (default: 180)
 #
 # Candidates:
@@ -24,14 +24,14 @@
 #   4. Run this script to validate
 #
 # Output:
-#   - Markdown report: ${REPORT_DIR}/phase2-evaluation-latest.md
+#   - Markdown report: ${REPORT_DIR}/runtime-evaluation-latest.md
 #   - Per-scenario logs: ${REPORT_DIR}/<scenario-name>.log
 #   - Exit code 0 if all scenarios match expected outcomes, 1 otherwise
 #
 set -euo pipefail
 
 REPORT_DIR="${REPORT_DIR:-docs/reports}"
-REPORT_FILE="${REPORT_FILE:-${REPORT_DIR}/phase2-evaluation-latest.md}"
+REPORT_FILE="${REPORT_FILE:-${REPORT_DIR}/runtime-evaluation-latest.md}"
 TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-180}"
 
 mkdir -p "${REPORT_DIR}"

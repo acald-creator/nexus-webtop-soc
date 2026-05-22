@@ -105,7 +105,7 @@ DESKTOP_REQUIRED=1 ANALYST_IMAGE=phoenixvlabs/nexus-webtop-soc:amd64-phase2b-lat
 Phase 2 matrix evaluation (report + logs):
 
 ```sh
-./scripts/evaluate-phase2-matrix.sh
+./scripts/evaluate-runtime-matrix.sh
 ```
 
 Zarf dev-stage package validation:

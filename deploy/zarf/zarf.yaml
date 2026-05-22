@@ -27,8 +27,8 @@ components:
         target: scripts/bootstrap-wazuh-security.sh
       - source: ../../scripts/validate-analyst-image.sh
         target: scripts/validate-analyst-image.sh
-      - source: ../../scripts/evaluate-phase2-matrix.sh
-        target: scripts/evaluate-phase2-matrix.sh
+      - source: ../../scripts/evaluate-runtime-matrix.sh
+        target: scripts/evaluate-runtime-matrix.sh
       - source: ../../docs/soc-baseline.md
         target: docs/soc-baseline.md
       - source: ../../docs/base-image-migration.md

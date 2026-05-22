@@ -26,7 +26,7 @@ The Phase 2a candidate (`Dockerfile.runtime-a.amd64`) follows **Option 2**: repl
 
 The `phase2a` candidate uses `cgr.dev/chainguard/wolfi-base` as the runtime base with nginx serving a placeholder page on port 3000. It validates the build, publish, and compose integration path without claiming desktop parity.
 
-Matrix evaluation results (`docs/reports/phase2-evaluation-latest.md`) confirm:
+Matrix evaluation results (`docs/reports/runtime-evaluation-latest.md`) confirm:
 
 - `phase2a` passes plumbing checks (`DESKTOP_REQUIRED=0`)
 - `phase2a` correctly fails desktop-required checks (`DESKTOP_REQUIRED=1`)
@@ -80,12 +80,12 @@ ACTIVE_DESKTOP_REQUIRED=1 ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate
 To run the current candidate matrix and generate a report:
 
 ```sh
-./scripts/evaluate-phase2-matrix.sh
+./scripts/evaluate-runtime-matrix.sh
 ```
 
 Generated report:
 
-- `docs/reports/phase2-evaluation-latest.md`
+- `docs/reports/runtime-evaluation-latest.md`
 
 ## Implementation Checklist
 
@@ -103,9 +103,9 @@ Generated report:
 To add a new Phase 2 candidate:
 
 1. Create a new Dockerfile following the naming convention: `Dockerfile.<candidate-id>.amd64`
-2. Add an entry to the `rows` array in `scripts/evaluate-phase2-matrix.sh` with scenario name, image reference, desktop-required flag, and expected outcome
+2. Add an entry to the `rows` array in `scripts/evaluate-runtime-matrix.sh` with scenario name, image reference, desktop-required flag, and expected outcome
 3. Test locally: `DOCKERFILE=Dockerfile.<id>.amd64 TAG_SUFFIX=<id> PUSH=0 ./scripts/run-runtime-candidate.sh`
-4. Run the full matrix: `./scripts/evaluate-phase2-matrix.sh`
+4. Run the full matrix: `./scripts/evaluate-runtime-matrix.sh`
 5. Document findings in this file under a new subsection
 
 ## Recommended Immediate Next Step

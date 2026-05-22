@@ -28,11 +28,11 @@ those services for a full SOC baseline environment.
 | `scripts/bootstrap-wazuh-security.sh` | Initializes OpenSearch security config in indexer after a fresh `down -v` |
 | `scripts/validate-analyst-image.sh` | Acceptance gate: healthchecks, curl, tool availability, optional desktop markers |
 | `scripts/run-runtime-candidate.sh` | Build + validate wrapper for Phase 2 candidates |
-| `scripts/evaluate-phase2-matrix.sh` | Runs all candidate scenarios and generates report to `docs/reports/` |
+| `scripts/evaluate-runtime-matrix.sh` | Runs all candidate scenarios and generates report to `docs/reports/` |
 | `architecture.md` | Canonical architecture guide (**source of truth**) |
 | `docs/soc-baseline.md` | SOC baseline operations guide |
 | `docs/base-image-migration.md` | Phase 2 migration plan and candidate evaluation |
-| `docs/reports/phase2-evaluation-latest.md` | Latest matrix evaluation results |
+| `docs/reports/runtime-evaluation-latest.md` | Latest matrix evaluation results |
 
 ---
 
@@ -85,7 +85,7 @@ ANALYST_IMAGE=<image:tag> ./scripts/validate-analyst-image.sh
 **Run full Phase 2 evaluation matrix:**
 
 ```bash
-./scripts/evaluate-phase2-matrix.sh
+./scripts/evaluate-runtime-matrix.sh
 ```
 
 ---
@@ -119,7 +119,7 @@ ANALYST_IMAGE=<image:tag> ./scripts/validate-analyst-image.sh
 - Always test changes with `validate-analyst-image.sh` before considering them complete.
 - When adding a new Phase 2 candidate:
   1. Create a new `Dockerfile.<desktop>.<arch>.<variant>`.
-  2. Add an entry to the `rows` array in `scripts/evaluate-phase2-matrix.sh`.
+  2. Add an entry to the `rows` array in `scripts/evaluate-runtime-matrix.sh`.
   3. Document the candidate in `docs/base-image-migration.md`.
 
 ---

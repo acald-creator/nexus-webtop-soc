@@ -10,8 +10,8 @@ All notable changes to this project are documented in this file.
 ## 2026-05-21
 
 ### Added
-- Phase 2 candidate matrix evaluation script (`scripts/evaluate-phase2-matrix.sh`).
-- Generated evaluation report at `docs/reports/phase2-evaluation-latest.md`.
+- Phase 2 candidate matrix evaluation script (`scripts/evaluate-runtime-matrix.sh`).
+- Generated evaluation report at `docs/reports/runtime-evaluation-latest.md`.
 - Matrix evaluation command documented in README and Phase 2 migration doc.
 
 ## 2026-05-20

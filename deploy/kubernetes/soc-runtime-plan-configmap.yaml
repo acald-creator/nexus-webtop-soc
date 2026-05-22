@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: phase2-soc-runtime-plan
+  name: soc-runtime-plan
   namespace: nexus-soc
   labels:
-    app.kubernetes.io/name: phase2-soc-runtime-plan
+    app.kubernetes.io/name: soc-runtime-plan
     app.kubernetes.io/part-of: nexus-webtop-soc
 data:
   status: "placeholder"
