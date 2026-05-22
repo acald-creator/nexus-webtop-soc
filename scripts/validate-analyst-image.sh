@@ -49,17 +49,17 @@ wait_for_healthy "wazuh.dashboard" "${TIMEOUT_SECONDS}"
 wait_for_healthy "suricata.sensor" "${TIMEOUT_SECONDS}"
 wait_for_healthy "${ANALYST_SERVICE}" "${TIMEOUT_SECONDS}"
 
-echo "[validate] checking web endpoint..."
+echo "[validate] checking health endpoint..."
 web_ok=0
 for _ in $(seq 1 30); do
-  if curl -fsSI --max-time 5 http://localhost:3000 >/dev/null 2>&1; then
+  if curl -fsSI --max-time 5 http://localhost:3000/healthz >/dev/null 2>&1; then
     web_ok=1
     break
   fi
   sleep 1
 done
 if [ "${web_ok}" != "1" ]; then
-  echo "[validate] web endpoint did not become ready on http://localhost:3000" >&2
+  echo "[validate] health endpoint did not become ready on http://localhost:3000/healthz" >&2
   exit 1
 fi
 

@@ -42,7 +42,7 @@ those services for a full SOC baseline environment.
 |----------|---------|-------------|
 | `WEBTOP_ANALYST_IMAGE` | `phoenixvlabs/nexus-webtop-soc:amd64-cg-latest` | Override analyst image in compose |
 | `DOCKERFILE` | `Dockerfile.xfce.amd64` | Which Dockerfile to build |
-| `TAG_SUFFIX` | *(empty)* | Suffix for image tags (e.g., `cg`, `phase2a`) |
+| `TAG_SUFFIX` | *(empty)* | Suffix for image tags (e.g., `cg`, `runtime-a`) |
 | `PUSH` | `1` | Whether to push built image (`0` for local-only) |
 | `INSTALL_GITKRAKEN` | `0` | Include GitKraken in analyst image |
 | `DESKTOP_REQUIRED` | `1` | Whether to check desktop capability markers during validation |

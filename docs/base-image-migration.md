@@ -49,7 +49,7 @@ Every candidate must be scored against:
 A candidate passes only if all checks pass:
 
 1. `docker compose -f deploy/compose/soc-baseline.yml --profile analyst up -d` works with explicit image override.
-2. `curl -I http://localhost:3000` returns `200`.
+2. `curl -I http://localhost:3000/healthz` returns `200`.
 3. In-container checks succeed: `git --version`, `curl --version`.
 4. SOC core services remain healthy during analyst rollout:
    - `wazuh.indexer` healthy

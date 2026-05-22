@@ -108,7 +108,7 @@ Default local ports:
 - Wazuh Dashboard: `http://localhost:5601`
 - Wazuh Indexer (OpenSearch API): `https://localhost:9200`
 - Wazuh Manager API: `https://localhost:55000`
-- Analyst webtop: `http://localhost:3000` (when `analyst` profile is enabled)
+- Analyst webtop: `http://localhost:3000/healthz` (when `analyst` profile is enabled)
 
 ## Stop
 
@@ -226,7 +226,7 @@ After changing `WEBTOP_ANALYST_IMAGE`, verify:
 
 ```sh
 docker compose -f deploy/compose/soc-baseline.yml ps webtop.analyst
-curl -I --max-time 10 http://localhost:3000
+curl -I --max-time 10 http://localhost:3000/healthz
 docker exec webtop.analyst bash -lc 'git --version && curl --version | head -n 1'
 ```
 

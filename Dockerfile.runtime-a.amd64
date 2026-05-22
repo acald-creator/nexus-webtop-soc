@@ -1,5 +1,5 @@
 #
-# Phase 2a candidate: first true non-LinuxServer runtime baseline.
+# Runtime-a candidate: first true non-LinuxServer runtime baseline.
 # This is a plumbing candidate to validate build/publish/compose integration.
 # It is not feature-parity with the XFCE analyst desktop yet.
 #
@@ -10,7 +10,7 @@ ENV VERSION=$VERSION
 ARG BUILD_TIMESTAMP
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 
-LABEL description="Nexus Webtop SOC phase2a candidate (non-LinuxServer runtime baseline)."
+LABEL description="Nexus Webtop SOC runtime-a candidate (non-LinuxServer runtime baseline)."
 LABEL org.opencontainers.image.vendor="Fenix Secure Labs"
 LABEL org.opencontainers.image.version="${VERSION}"
 LABEL org.opencontainers.image.created="${BUILD_TIMESTAMP}"
@@ -39,21 +39,17 @@ http {
     listen 3000;
     server_name _;
     root /usr/share/nginx/html;
-    index index.html;
+
+    location = /healthz {
+      default_type text/plain;
+      return 200 "ok\n";
+    }
 
     location / {
-      try_files $uri $uri/ =404;
+      return 404;
     }
   }
 }
-EOF
-
-RUN cat > /usr/share/nginx/html/index.html <<'EOF'
-<!doctype html>
-<html>
-  <head><meta charset="utf-8"><title>phase2a candidate</title></head>
-  <body><h1>phase2a candidate image is running</h1></body>
-</html>
 EOF
 
 EXPOSE 3000

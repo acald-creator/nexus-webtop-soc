@@ -1,6 +1,6 @@
 #
-# Phase 2b candidate: non-LinuxServer runtime with desktop marker parity.
-# This extends phase2a by installing an explicit desktop session marker
+# Runtime-b candidate: non-LinuxServer runtime with desktop marker parity.
+# This extends runtime-a by installing an explicit desktop session marker
 # (`openbox`) so strict desktop-capability gate checks can pass.
 #
 FROM --platform=amd64 cgr.dev/chainguard/wolfi-base:latest
@@ -11,7 +11,7 @@ ARG BUILD_TIMESTAMP
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 ENV DISPLAY=:99
 
-LABEL description="Nexus Webtop SOC phase2b candidate (non-LinuxServer runtime with desktop marker)."
+LABEL description="Nexus Webtop SOC runtime-b candidate (non-LinuxServer runtime with desktop marker)."
 LABEL org.opencontainers.image.vendor="Fenix Secure Labs"
 LABEL org.opencontainers.image.version="${VERSION}"
 LABEL org.opencontainers.image.created="${BUILD_TIMESTAMP}"
@@ -40,24 +40,19 @@ http {
     listen 3000;
     server_name _;
     root /usr/share/nginx/html;
-    index index.html;
+
+    location = /healthz {
+      default_type text/plain;
+      return 200 "ok\n";
+    }
 
     location / {
-      try_files $uri $uri/ =404;
+      return 404;
     }
   }
 }
 EOF
-
-RUN cat > /usr/share/nginx/html/index.html <<'EOF'
-<!doctype html>
-<html>
-  <head><meta charset="utf-8"><title>phase2b candidate</title></head>
-  <body><h1>phase2b candidate image is running</h1></body>
-</html>
-EOF
-
-RUN cat > /usr/local/bin/start-phase2b.sh <<'EOF'
+RUN cat > /usr/local/bin/start-runtime-b.sh <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -83,8 +78,8 @@ done
 exec nginx -g 'daemon off;'
 EOF
 
-RUN chmod +x /usr/local/bin/start-phase2b.sh
+RUN chmod +x /usr/local/bin/start-runtime-b.sh
 
 EXPOSE 3000
 
-CMD ["/usr/local/bin/start-phase2b.sh"]
+CMD ["/usr/local/bin/start-runtime-b.sh"]
