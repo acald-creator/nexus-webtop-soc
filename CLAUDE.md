@@ -2,25 +2,24 @@
 
 Use `architecture.md` as the canonical architecture guide for this repository.
 
-Claude is especially useful for:
+## Strengths for This Repo
 
-- Reviewing the split between analyst desktop and SOC runtime.
+- Reviewing the split between analyst desktop and SOC runtime services.
 - Finding places where Suricata or Wazuh responsibilities are mixed into the webtop.
 - Checking security claims and credential handling.
 - Clarifying what should move into dedicated SOC services.
+- Verifying that agent-generated traffic labeling is properly filtered in dashboards.
 
-Return findings with file references and avoid rewriting implementation unless explicitly asked.
-
-### Credential and Secret Locations
+## Credential and Secret Locations
 
 When reviewing security, these are the current credential touchpoints:
 
-- `deploy/compose/soc-baseline.yml` lines 40-43: indexer connection credentials (`admin`/`admin`)
+- `deploy/compose/soc-baseline.yml` lines 40-43: indexer connection credentials
 - `deploy/compose/soc-baseline.yml` lines 74-80: dashboard credentials and SSL settings
-- `scripts/bootstrap-wazuh-security.sh` lines 37-43: TLS certificate paths used for securityadmin
+- `scripts/bootstrap-wazuh-security.sh` lines 37-43: TLS certificate paths for securityadmin
 - Dockerfiles: should contain NO credentials (verify this)
 
-### File-to-Concern Mapping
+## File-to-Concern Mapping
 
 | Concern | Files |
 |---------|-------|
@@ -30,10 +29,9 @@ When reviewing security, these are the current credential touchpoints:
 | Evaluation | `scripts/evaluate-runtime-matrix.sh`, `scripts/run-runtime-candidate.sh`, `docs/reports/` |
 | Architecture decisions | `architecture.md`, `docs/base-image-migration.md` |
 
-### Expected Output Format
+## Output Expectations
 
-When asked to review, return findings as:
-
+Return findings as:
 1. File path and line range
 2. What was found
 3. Why it matters (security, architectural drift, or operational risk)
