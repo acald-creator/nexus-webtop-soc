@@ -1,227 +1,129 @@
 # Nexus Webtop SOC
 
-Nexus Webtop SOC is the legacy analyst desktop image for the Underground Nexus SOC environment.
+SOC baseline stack and legacy analyst desktop for Underground Nexus. Provides the detection pipeline (Wazuh + Suricata) that receives labeled traffic from Athena agents and feeds the AI-SOC triage loop.
 
-The proposed architecture moves SOC runtime services out of this webtop image. Wazuh, Suricata, optional Zeek, and AI triage should run as dedicated services. The webtop should become a client workspace for analysts, not the place where detection infrastructure is compiled and hosted.
+**Note:** The analyst desktop image in this repo is being superseded by [nexus-webtop-workbench](https://github.com/acald-creator/nexus-webtop-workbench). The primary value of this repo is the **SOC baseline compose stack**.
 
-## Current Status
+## Quick Start
 
-The current image is based on `linuxserver/webtop:amd64-ubuntu-xfce`, installs GitKraken, and builds Suricata from source inside the image. That works for experimentation, but it mixes analyst desktop tooling with SOC detection runtime.
+```bash
+# Start the SOC baseline stack
+docker compose -f deploy/compose/soc-baseline.yml up -d
 
-See [architecture.md](architecture.md) for the proposed architecture.
+# Bootstrap OpenSearch security (first run or after down -v)
+./scripts/bootstrap-wazuh-security.sh
 
-## Target Role
-
-The webtop SOC image is responsible for:
-
-- Analyst desktop access.
-- Browser access to Wazuh Dashboard, Grafana, and documentation.
-- Notes, terminals, and controlled investigation tooling.
-- Optional GUI utilities for local lab investigation.
-
-The webtop SOC image is not responsible for:
-
-- Running Wazuh manager, indexer, or dashboard services.
-- Running Suricata as an embedded desktop process.
-- Compiling production SOC tools inside a GUI image.
-- Storing SOC events.
-- Hosting AI triage services.
-
-## Target SOC Split
-
-| Component | Target location |
-| --- | --- |
-| Wazuh manager | Dedicated SOC service |
-| Wazuh indexer | Dedicated persistent event store |
-| Wazuh dashboard | Dedicated dashboard service |
-| Wazuh agents | Host and workload telemetry collectors |
-| Suricata | Dedicated network/protocol sensor |
-| Optional Zeek | Later protocol metadata sensor |
-| AI triage | Dedicated enrichment service |
-| Webtop | Analyst client workspace |
-
-## Image
-
-Current image:
-
-```sh
-docker pull phoenixvlabs/nexus-webtop-soc:amd64-latest
-```
-
-Current build asset:
-
-```text
-Dockerfile.xfce.amd64
-```
-
-Current build helper:
-
-```text
-build-amd64-image.sh
-```
-
-Experimental Chainguard transition build:
-
-```sh
-DOCKERFILE=Dockerfile.xfce.amd64.chainguard TAG_SUFFIX=cg PUSH=0 ./build-amd64-image.sh
-```
-
-Phase 2 runtime replacement planning:
-
-- [docs/base-image-migration.md](docs/base-image-migration.md)
-- [docs/zarf-dev-stage.md](docs/zarf-dev-stage.md)
-
-Phase 2 acceptance gate command:
-
-```sh
+# Validate analyst image
 ANALYST_IMAGE=phoenixvlabs/nexus-webtop-soc:amd64-cg-latest ./scripts/validate-analyst-image.sh
 ```
 
-Desktop parity marker checks are enabled by default. For runtime-plumbing candidates only:
+**Access points:**
+- Wazuh Dashboard: https://localhost:5601 (admin/admin)
+- Suricata alerts: via Wazuh event pipeline
 
-```sh
-DESKTOP_REQUIRED=0 ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate-analyst-image.sh
+## Architecture
+
+```mermaid
+graph TD
+    subgraph "Detection Pipeline"
+        S[Suricata Sensor] -->|eve.json| F[Forwarder]
+        F --> M[Wazuh Manager]
+        M --> I[Wazuh Indexer]
+        I --> D[Wazuh Dashboard :5601]
+    end
+
+    subgraph "Traffic Sources"
+        Athena[nexus-athena Agent] -->|Labeled Traffic| S
+        Lab[Lab Network] --> S
+    end
+
+    subgraph "Consumers"
+        GW[API Gateway :3100] -->|/api/v1/alerts| M
+        Console[Nexus Console :3000] --> GW
+        TUI[nexus-tui] --> GW
+    end
 ```
 
-To enforce active desktop session checks:
+## Repository Layout
 
-```sh
-ACTIVE_DESKTOP_REQUIRED=1 ANALYST_IMAGE=<candidate-image:tag> ./scripts/validate-analyst-image.sh
+```
+.
+├── deploy/
+│   └── compose/
+│       └── soc-baseline.yml       # Full SOC stack (Wazuh + Suricata + analyst webtop)
+├── scripts/
+│   ├── bootstrap-wazuh-security.sh  # Initialize OpenSearch security
+│   ├── validate-analyst-image.sh    # Acceptance gate for desktop image
+│   ├── run-runtime-candidate.sh     # Build + validate Phase 2 candidates
+│   └── evaluate-runtime-matrix.sh   # Run all candidate scenarios
+├── docs/
+│   ├── soc-baseline.md             # Operations guide
+│   └── base-image-migration.md     # Phase 2 candidate evaluation
+├── Dockerfile.xfce.amd64           # Primary analyst desktop (LinuxServer XFCE)
+├── Dockerfile.xfce.amd64.chainguard # Chainguard transition track
+├── Dockerfile.runtime-a.amd64      # Phase 2a candidate (wolfi-base, no desktop)
+├── Dockerfile.runtime-b.amd64      # Phase 2b candidate
+├── architecture.md                  # SOC architecture guide
+└── ROADMAP.md                       # Development roadmap
 ```
 
-Runtime candidate wrapper (build + acceptance gate):
+## SOC Baseline Stack
 
-```sh
-DOCKERFILE=Dockerfile.runtime-a.amd64 TAG_SUFFIX=runtime-a PUSH=0 ./scripts/run-runtime-candidate.sh
-```
+The compose stack runs dedicated services (not embedded in the desktop):
 
-Runtime-b strict desktop-marker candidate:
+| Service | Image | Purpose |
+|---------|-------|---------|
+| `wazuh.manager` | `wazuh/wazuh-manager:4.7.5` | Alert processing, rules, API |
+| `wazuh.indexer` | `wazuh/wazuh-indexer:4.7.5` | Security event storage |
+| `wazuh.dashboard` | `wazuh/wazuh-dashboard:4.7.5` | Analyst investigation UI |
+| `suricata.sensor` | `jasonish/suricata:7.0` | Network IDS, eve.json generation |
+| `webtop.analyst` | `phoenixvlabs/nexus-webtop-soc:*` | XFCE analyst desktop (legacy) |
 
-```sh
-DOCKERFILE=Dockerfile.runtime-b.amd64 TAG_SUFFIX=runtime-b PUSH=0 ./scripts/run-runtime-candidate.sh
-DESKTOP_REQUIRED=1 ANALYST_IMAGE=phoenixvlabs/nexus-webtop-soc:amd64-runtime-b-latest ./scripts/validate-analyst-image.sh
-```
+## Integration with Athena Agents
 
-Runtime matrix evaluation (report + logs):
+When the Athena agent runs against targets on the same network:
+1. Agent generates labeled traffic (`X-Athena-Scenario` headers)
+2. Suricata captures and generates alerts
+3. Wazuh ingests and indexes events
+4. API Gateway queries Wazuh for alert data
+5. Console/TUI displays alerts with "Simulated" tags for Athena traffic
 
-```sh
-./scripts/evaluate-runtime-matrix.sh
-```
+Filter Athena traffic in Wazuh: search for `athena_scenario` field in alert metadata.
 
-Zarf dev-stage package validation:
+## Desktop Image Variants
 
-```sh
-zarf package create deploy/zarf --confirm
-zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --confirm
-```
+| Dockerfile | Base | Status | Desktop |
+|------------|------|--------|---------|
+| `Dockerfile.xfce.amd64` | linuxserver/webtop | Active (legacy) | Full XFCE |
+| `Dockerfile.xfce.amd64.chainguard` | linuxserver/webtop + CG hardening | Evaluation | Full XFCE |
+| `Dockerfile.runtime-a.amd64` | cgr.dev/chainguard/wolfi-base | Phase 2 candidate | None (headless) |
+| `Dockerfile.runtime-b.amd64` | Experimental | Phase 2 candidate | None |
 
-Optional runtime Kubernetes scaffold deploy:
+## Environment Variables
 
-```sh
-zarf package deploy zarf-package-nexus-webtop-soc-dev-amd64-0.1.0.tar.zst --components runtime-kubernetes-scaffold --confirm
-```
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `WEBTOP_ANALYST_IMAGE` | `phoenixvlabs/nexus-webtop-soc:amd64-cg-latest` | Override analyst image in compose |
+| `DOCKERFILE` | `Dockerfile.xfce.amd64` | Which Dockerfile to build |
+| `PUSH` | `1` | Whether to push built image (`0` for local-only) |
+| `TIMEOUT_SECONDS` | `180` | Healthcheck wait timeout for validation |
 
-Local manifest preview:
+## Cross-Repo Integration
 
-```sh
-kubectl kustomize deploy/kubernetes
-```
-
-Local overlay apply (includes lab `wazuh-auth` secret defaults):
-
-```sh
-kubectl apply -k deploy/kubernetes/overlays/local
-```
-
-Production overlay prep:
-
-```sh
-cp deploy/kubernetes/overlays/prod/secrets/wazuh-auth.env.example \
-  deploy/kubernetes/overlays/prod/secrets/wazuh-auth.env
-```
-
-Then apply:
-
-```sh
-kubectl apply -k deploy/kubernetes/overlays/prod
-```
-
-Kubernetes runtime notes:
-
-- Base manifests are in `deploy/kubernetes/base`; apply overlays for environment-specific secret handling.
-- `wazuh-indexer` uses `Recreate` strategy to avoid conflicting concurrent pods on the same data path.
-- Baseline `NetworkPolicy` objects are enabled:
-  - `default-deny-ingress`
-  - `allow-intra-namespace`
-  - `allow-wazuh-dashboard-ingress`
-  - `allow-wazuh-manager-ingress`
-
-## First Milestone: Local SOC Baseline
-
-The first practical milestone is now captured in:
-
-- [docs/soc-baseline.md](docs/soc-baseline.md)
-
-This baseline runs:
-
-- Wazuh manager
-- Wazuh indexer
-- Wazuh dashboard
-- Suricata sensor
-- Suricata event forwarder into Wazuh manager
-- Analyst webtop client (optional `analyst` profile)
-
-Start it with:
-
-```sh
-docker compose -f deploy/compose/soc-baseline.yml up -d
-```
-
-The compose stack now uses healthchecks and dependency conditions for deterministic service startup ordering.
-
-For a fresh stack (`down -v`), initialize indexer security:
-
-```sh
-./scripts/bootstrap-wazuh-security.sh
-```
-
-If you have built the workbench image locally, enable the analyst profile:
-
-```sh
-docker compose -f deploy/compose/soc-baseline.yml --profile analyst up -d
-```
-
-By default, the analyst profile now uses `phoenixvlabs/nexus-webtop-soc:amd64-cg-latest`.  
-To use a different analyst image (workbench local or classic XFCE), override `WEBTOP_ANALYST_IMAGE` as documented in [docs/soc-baseline.md](docs/soc-baseline.md).
-
-## Local-Only and Deprecated Direction
-
-| Item | Status | Direction |
-| --- | --- | --- |
-| Suricata built inside the webtop image | Deprecated direction | Move Suricata into a dedicated sensor image. |
-| GitKraken in SOC desktop | Optional | Keep only if needed by analyst workflow; prefer browser or CLI Git workflows. |
-| SOC control plane inside a desktop image | Deprecated direction | Split Wazuh services into dedicated workloads. |
-| Single `amd64` image only | Current limitation | Add architecture strategy if this image remains in use. |
-| Credentials or certificates in image | Not allowed | Use Vault HA or selected platform secret manager. |
-
-## Supply Chain
-
-This repository includes:
-
-```text
-soc-admin-webtop-amd64-latest.spdx
-```
-
-Historical Cosign, Syft, and attestation examples should move into dedicated supply-chain documentation if they need to be preserved. The README should stay focused on role, build path, architecture direction, and what is being moved out of the image.
+| Repository | Relationship |
+|------------|-------------|
+| `core-nexus` | Architecture hub — this repo must stay aligned |
+| `nexus-webtop-workbench` | Recommended analyst desktop (supersedes this repo's XFCE image) |
+| `nexus-athena` | Generates labeled attack traffic detected by this SOC stack |
+| `athena-agents` | OPAR agent traffic source — labels must be filterable in Wazuh |
+| `core-nexus/platform/api-gateway` | Queries Wazuh Manager API for alert aggregation |
 
 ## AI Collaboration
 
-AI assistants should use these entrypoints:
-
-- [AGENTS.md](AGENTS.md) for Codex-style coding agents.
-- [CLAUDE.md](CLAUDE.md) for architecture critique and threat modeling.
-- [GEMINI.md](GEMINI.md) for research and platform comparison.
-- [architecture.md](architecture.md) as the source of truth for the proposed SOC split.
+- [AGENTS.md](AGENTS.md) — Agent coding instructions
+- [CLAUDE.md](CLAUDE.md) — Security review and architecture critique
+- [GEMINI.md](GEMINI.md) — SOC service research and comparison
+- [architecture.md](architecture.md) — SOC architecture guide
 
 ## License
 
